@@ -1,4 +1,5 @@
 import pandas as pd
 
-print('hello world')
-print(pd.__version__)
+from utils import constants
+
+print(constants.PROJECT_ROOT)
