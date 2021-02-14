@@ -1,7 +1,9 @@
+import os
+
 import pandas as pd
 import numpy as np
 import sklearn.neighbors as knn
-import os
+from tqdm import tqdm
 
 from utils import constants
 
@@ -10,7 +12,7 @@ from utils import constants
 KNN_LEAF_SIZE = 50
 
 
-def _print_unique(df):
+def print_unique(df):
     for col in df:
         u = df[col].unique()
         print(f'{col}: {len(df[col])}, {len(u)} unique')
@@ -18,9 +20,9 @@ def _print_unique(df):
         print()
 
 
-def _load_inputs():
+def load_inputs():
     """
-    Load orca->xy and xy->stops datasets, filter for values we care about.
+    Load orca->xy and xy->stops datasets, filter for rows we care about.
     """
 
     # Load data
@@ -44,16 +46,42 @@ def _load_inputs():
     return orca_df, stop_df
 
 
-def _reduce_stop_df(stop_df):
+def reduce_stop_df(stop_df):
     """
     Aggregate stop_df to only include unique stop IDs by averaging the xy
     coordinates of duplicates.
     """
 
-    return stop_df
+    seen = dict()
+    result = []
+
+    n = stop_df.shape[0]
+    for i in tqdm(range(n), desc='Reducing stops data'):
+        row = stop_df.iloc[i].to_numpy()
+        stop_id = int(row[2])
+
+        if stop_id not in seen:
+            result.append(row)
+            seen[stop_id] = len(result) - 1
+
+        else:
+            i_update = seen[stop_id]
+            row_update = result[i_update]
+
+            # I haven't seen any cases where the update is different and taking
+            # the avg is needed, but let's keep it to be safe.
+            lon = np.average([row_update[3], row[3]])
+            lat = np.average([row_update[4], row[4]])
+            row_update[3] = lon
+            row_update[4] = lat
+
+            result[i_update] = row_update
+
+    result_df = pd.DataFrame(result, columns=stop_df.columns)
+    return result_df
 
 
-def _map_nearest_neighbors(orca_df, stop_df):
+def map_nearest_neighbors(orca_df, stop_df):
     """
     Find the stop ID and route number for each entry in orca_df by the nearest
     xy pair in stop_df.
@@ -68,28 +96,25 @@ def _map_nearest_neighbors(orca_df, stop_df):
 
     # Run 1nn over dataset
     n = orca_df.shape[0]
-    for i in range(n):
+    for i in tqdm(range(n), desc='Calculating nearest neighbors'):
 
         # TODO implement reference table for duplicate xy pairs
 
         # Query knn tree
         o_row = orca_df.iloc[i]
-        o_lat = o_row['boarding_latitude']
-        o_lon = o_row['boarding_longitude']
-        x_i = np.array([o_lat, o_lon]).reshape((1, -1))
+        if i % 10000 == 0:
+            print(o_row)
+            print(o_row.to_numpy())
+        # o_lat = o_row['boarding_latitude']
+        # o_lon = o_row['boarding_longitude']
+        # x_i = np.array([o_lat, o_lon]).reshape((1, -1))
 
-        dist, nn_index = tree.query(x_i, k=1)
-        nn_index = nn_index[0]  # unpack single value
+        # dist, nn_index = tree.query(x_i, k=1)
+        # nn_index = nn_index[0]  # unpack single value
 
-        s_row = stop_df.iloc[nn_index]
-        s_lat = float(s_row['lat'])
-        s_lon = float(s_row['lon'])
-
-        if i % (n / 100) == 0:
-            print(
-                f'{i} / {orca_df.shape[0]}\t'
-                f'({round(100 * i / n, 2)}%)'
-            )
+        # s_row = stop_df.iloc[nn_index]
+        # s_lat = float(s_row['lat'])
+        # s_lon = float(s_row['lon'])
 
 
 def run_pipeline():
@@ -98,20 +123,9 @@ def run_pipeline():
     associated stop ID and route number.
     """
 
-    orca_df, stop_df = _load_inputs()
-    print('Done loading')
-
-    # stop_df = _reduce_stop_df(stop_df)
-    # print('Done reducing')
-
-    # _map_nearest_neighbors(orca_df, stop_df)
-    # print('Done mapping')
-
-    print('ORCA_DF')
-    _print_unique(orca_df)
-
-    print('STOP_DF')
-    _print_unique(stop_df)
+    orca_df, stop_df = load_inputs()
+    stop_df = reduce_stop_df(stop_df)
+    map_nearest_neighbors(orca_df, stop_df)
 
 
 if __name__ == '__main__':
