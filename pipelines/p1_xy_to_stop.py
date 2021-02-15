@@ -5,19 +5,14 @@ import numpy as np
 import sklearn.neighbors as knn
 from tqdm import tqdm
 
-from utils import constants
+from utils import constants, data_utils
 
 
 # Parameters
 KNN_LEAF_SIZE = 50
 
-
-def print_unique(df):
-    for col in df:
-        u = df[col].unique()
-        print(f'{col}: {len(df[col])}, {len(u)} unique')
-        print(u)
-        print()
+OUTPUT_FILENAME = 'p1_orca_by_stop'
+OUTPUT_DIR = os.path.join(constants.WRITE_DIR)
 
 
 def load_inputs():
@@ -94,38 +89,66 @@ def map_nearest_neighbors(orca_df, stop_df):
     x = [get_pair(stop_df.iloc[i]) for i in range(stop_df.shape[0])]
     tree = knn.KDTree(x, leaf_size=KNN_LEAF_SIZE)
 
+    # Columns:
+    # 0 'season', 1 'passenger_type', 2 'boarding_type', 3 'boarding_latitude',
+    # 4 'boarding_longitude', 5 'agency', 6 'mode_abbrev', 7 'product_type',
+    # 8 'time_period', 9 'day_type', 10 'boarding_count'
+    orca_arr = orca_df.to_numpy()
+    stop_arr = stop_df.to_numpy()
+    ids = []
+
     # Run 1nn over dataset
-    n = orca_df.shape[0]
+    n = len(orca_arr)
     for i in tqdm(range(n), desc='Calculating nearest neighbors'):
 
-        # TODO implement reference table for duplicate xy pairs
-
         # Query knn tree
-        o_row = orca_df.iloc[i]
-        if i % 10000 == 0:
-            print(o_row)
-            print(o_row.to_numpy())
-        # o_lat = o_row['boarding_latitude']
-        # o_lon = o_row['boarding_longitude']
-        # x_i = np.array([o_lat, o_lon]).reshape((1, -1))
+        o_row = orca_arr[i]
+        o_lat = o_row[3]
+        o_lon = o_row[4]
+        x_i = np.array([o_lat, o_lon]).reshape((1, -1))
 
-        # dist, nn_index = tree.query(x_i, k=1)
-        # nn_index = nn_index[0]  # unpack single value
+        # TODO some of these distances are really high. Look into it?
+        _, nn_index = tree.query(x_i, k=1)
+        nn_index = nn_index[0]
 
-        # s_row = stop_df.iloc[nn_index]
-        # s_lat = float(s_row['lat'])
-        # s_lon = float(s_row['lon'])
+        s_row = stop_arr[nn_index][0]
+        ids.append((int(s_row[1]), int(s_row[2])))  # route_id, stop_id
+
+    # Merge orca and stop datasets
+    merged_arr = []
+    for i in tqdm(range(n), desc='Merging datasets'):
+        route_id, stop_id = ids[i]
+        merged_row = np.copy(orca_arr[i])
+        merged_row = np.append(merged_row, route_id)
+        merged_row = np.append(merged_row, stop_id)
+        merged_arr.append(merged_row)
+
+    cols = np.copy(orca_df.columns)
+    cols = np.append(cols, 'route_id')
+    cols = np.append(cols, 'stop_id')
+    return pd.DataFrame(merged_arr, columns=cols)
 
 
 def run_pipeline():
     """
     Creates a mapping from each entry in winter 2019 ORCA dataset to its
-    associated stop ID and route number.
+    associated stop ID and route number and writes this mapping to disk.
     """
 
+    # Run pipeline
     orca_df, stop_df = load_inputs()
     stop_df = reduce_stop_df(stop_df)
-    map_nearest_neighbors(orca_df, stop_df)
+    merged_df = map_nearest_neighbors(orca_df, stop_df)
+
+    print('\Output:')
+    data_utils.print_unique(merged_df)
+
+    # Write CSV
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+    fname = os.path.join(OUTPUT_DIR, f'{OUTPUT_FILENAME}.csv')
+    merged_df.to_csv(fname)
+    print(f'Wrote {OUTPUT_FILENAME}.csv to {OUTPUT_DIR}')
 
 
 if __name__ == '__main__':
