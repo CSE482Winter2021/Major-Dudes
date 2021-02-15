@@ -12,7 +12,6 @@ from utils import constants, data_utils
 KNN_LEAF_SIZE = 50
 
 OUTPUT_FILENAME = 'p1_orca_by_stop'
-OUTPUT_DIR = os.path.join(constants.WRITE_DIR)
 
 
 def load_inputs():
@@ -140,15 +139,15 @@ def run_pipeline():
     stop_df = reduce_stop_df(stop_df)
     merged_df = map_nearest_neighbors(orca_df, stop_df)
 
-    print('\Output:')
+    print('Output:')
     data_utils.print_unique(merged_df)
 
     # Write CSV
-    if not os.path.exists(OUTPUT_DIR):
-        os.mkdir(OUTPUT_DIR)
-    fname = os.path.join(OUTPUT_DIR, f'{OUTPUT_FILENAME}.csv')
+    if not os.path.exists(constants.WRITE_DIR):
+        os.mkdir(constants.WRITE_DIR)
+    fname = os.path.join(constants.WRITE_DIR, f'{OUTPUT_FILENAME}.csv')
     merged_df.to_csv(fname)
-    print(f'Wrote {OUTPUT_FILENAME}.csv to {OUTPUT_DIR}')
+    print(f'Wrote {OUTPUT_FILENAME}.csv to {constants.WRITE_DIR}')
 
 
 if __name__ == '__main__':
