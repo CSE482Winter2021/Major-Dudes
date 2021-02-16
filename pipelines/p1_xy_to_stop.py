@@ -8,10 +8,10 @@ from tqdm import tqdm
 from utils import constants, data_utils
 
 
-# Parameters
 KNN_LEAF_SIZE = 50
 
-OUTPUT_FILENAME = 'p1_orca_by_stop'
+OUTPUT_FILENAME = 'p1_orca_by_stop.csv'
+WRITE_DIR = constants.PIPELINE_OUTPUTS_DIR
 
 
 def load_inputs():
@@ -143,11 +143,11 @@ def run_pipeline():
     data_utils.print_unique(merged_df)
 
     # Write CSV
-    if not os.path.exists(constants.WRITE_DIR):
-        os.mkdir(constants.WRITE_DIR)
-    fname = os.path.join(constants.WRITE_DIR, f'{OUTPUT_FILENAME}.csv')
-    merged_df.to_csv(fname)
-    print(f'Wrote {OUTPUT_FILENAME}.csv to {constants.WRITE_DIR}')
+    if not os.path.exists(WRITE_DIR):
+        os.mkdir(WRITE_DIR)
+    fname = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
+    merged_df.to_csv(fname, index=False)
+    print(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
 
 
 if __name__ == '__main__':
