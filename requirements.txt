@@ -2,3 +2,4 @@ numpy >= 1.20.1
 pandas >= 1.2.1
 scikit_learn >= 0.24.1
 tqdm >= 4.56.2
+shapely >= 1.7.1
