@@ -3,22 +3,24 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
-from utils import constants, data_utils
+from utils import constants
 
+NAME = 'p2_prep_apc'
 
-WRITE_DIR = os.path.join(constants.PIPELINE_OUTPUTS_DIR, 'p2_apc_by_route')
 INTERVALS = [
-    '15min',
+    # '15min',
     '30min',
     'ampm',
     'day',
     'hr',
 ]
 SEASONS = [
-    'combined',
+    # 'combined',
     'summer',
     'winter',
 ]
+
+WRITE_DIR = os.path.join(constants.PIPELINE_OUTPUTS_DIR, 'p2_apc_by_route')
 
 
 def load_single(interval, season):

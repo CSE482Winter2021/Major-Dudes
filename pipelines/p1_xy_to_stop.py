@@ -5,8 +5,9 @@ import numpy as np
 import sklearn.neighbors as knn
 from tqdm import tqdm
 
-from utils import constants, data_utils
+from utils import constants
 
+NAME = 'p1_xy_to_stop'
 
 KNN_LEAF_SIZE = 50
 
@@ -139,15 +140,12 @@ def run_pipeline():
     stop_df = reduce_stop_df(stop_df)
     merged_df = map_nearest_neighbors(orca_df, stop_df)
 
-    print('Output:')
-    data_utils.print_unique(merged_df)
-
     # Write CSV
     if not os.path.exists(WRITE_DIR):
         os.mkdir(WRITE_DIR)
     fname = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
     merged_df.to_csv(fname, index=False)
-    print(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
+    tqdm.write(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
 
 
 if __name__ == '__main__':
