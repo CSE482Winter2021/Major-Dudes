@@ -43,37 +43,34 @@ def load_inputs():
 
 def reduce_stop_df(stop_df):
     """
-    Aggregate stop_df to only include unique stop IDs by averaging the xy
-    coordinates of duplicates.
+    Aggregate stop_df by creating a mapping from unique stop IDs to its set of
+    associated route IDs (i.e., the routes which include the stop).
     """
 
-    seen = dict()
-    result = []
+    col_keys = ['lon', 'lat', 'route_ids']
 
-    n = stop_df.shape[0]
-    for i in tqdm(range(n), desc='Reducing stops data'):
-        row = stop_df.iloc[i].to_numpy()
-        stop_id = int(row[2])
+    seen = dict()
+    for row in stop_df.to_numpy():
+        _, route_id, stop_id, lon, lat = tuple(row)
+        stop_id = int(stop_id)
+        route_id = int(route_id)
 
         if stop_id not in seen:
-            result.append(row)
-            seen[stop_id] = len(result) - 1
+            seen[stop_id] = dict(zip(col_keys, [lon, lat, {route_id}]))
 
         else:
-            i_update = seen[stop_id]
-            row_update = result[i_update]
+            seen[stop_id]['route_ids'].add(route_id)
 
             # I haven't seen any cases where the update is different and taking
             # the avg is needed, but let's keep it to be safe.
-            lon = np.average([row_update[3], row[3]])
-            lat = np.average([row_update[4], row[4]])
-            row_update[3] = lon
-            row_update[4] = lat
+            seen[stop_id]['lon'] = np.average([seen[stop_id]['lon'], lon])
+            seen[stop_id]['lat'] = np.average([seen[stop_id]['lat'], lat])
 
-            result[i_update] = row_update
-
-    result_df = pd.DataFrame(result, columns=stop_df.columns)
-    return result_df
+    result = [
+        [stop_id] + [seen[stop_id][key] for key in col_keys]
+        for stop_id in seen
+    ]
+    return pd.DataFrame(result, columns=['stop_id'] + col_keys)
 
 
 def map_nearest_neighbors(orca_df, stop_df):
@@ -82,7 +79,6 @@ def map_nearest_neighbors(orca_df, stop_df):
     xy pair in stop_df.
     """
 
-    # Get knn tree
     def get_pair(s_row):
         return (float(s_row['lat']), float(s_row['lon']))
 
@@ -100,11 +96,9 @@ def map_nearest_neighbors(orca_df, stop_df):
     # Run 1nn over dataset
     n = len(orca_arr)
     for i in tqdm(range(n), desc='Calculating nearest neighbors'):
-
-        # Query knn tree
         o_row = orca_arr[i]
-        o_lat = o_row[3]
-        o_lon = o_row[4]
+        o_lat = o_row[3]  # boarding_latitude
+        o_lon = o_row[4]  # boarding_longitude
         x_i = np.array([o_lat, o_lon]).reshape((1, -1))
 
         # TODO some of these distances are really high. Look into it?
@@ -112,7 +106,7 @@ def map_nearest_neighbors(orca_df, stop_df):
         nn_index = nn_index[0]
 
         s_row = stop_arr[nn_index][0]
-        ids.append((int(s_row[1]), int(s_row[2])))  # route_id, stop_id
+        ids.append((s_row[0], s_row[3]))  # stop_id, route_ids
 
     # Merge orca and stop datasets
     merged_arr = []
@@ -124,8 +118,8 @@ def map_nearest_neighbors(orca_df, stop_df):
         merged_arr.append(merged_row)
 
     cols = np.copy(orca_df.columns)
-    cols = np.append(cols, 'route_id')
     cols = np.append(cols, 'stop_id')
+    cols = np.append(cols, 'route_ids')
     return pd.DataFrame(merged_arr, columns=cols)
 
 

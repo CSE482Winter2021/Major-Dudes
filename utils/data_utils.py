@@ -4,6 +4,9 @@ def print_unique(df):
     """
 
     for col in df:
-        u = df[col].unique()
-        print(f'{col}: {len(df[col])}, {len(u)} unique')
-        print(u, '\n')
+        try:
+            u = df[col].unique()
+            print(f'{col}: {len(df[col])}, {len(u)} unique')
+            print(u, '\n')
+        except TypeError:
+            print(f'{col}: {len(df[col])}, unhashable')
