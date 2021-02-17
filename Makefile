@@ -16,3 +16,13 @@ bootstrap:
 # Pipelines
 p1:
 	@python3.9 pipelines/p1_xy_to_stop.py
+
+p2:
+	@python3.9 pipelines/p2_prep_apc.py
+
+p3:
+	@python3.9 pipelines/p3_aggregate_apc.py
+
+# Run all pipelines
+all:
+	@python3.9 pipelines/all.py
