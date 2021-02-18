@@ -17,7 +17,6 @@ def xy_to_tract_num(longitude, latitude):
     # Returns list of tracts that point is in or on the border of
 
     point = Point(longitude, latitude)
-    found = False
     tract = []
     for feature in geo_js['features']:
         polygon = shape(feature['geometry'])
@@ -39,18 +38,21 @@ def xy_to_tract_population(longitude, latitude):
     # latitude of coordinate in King Count
     #
     # Returns a dictionary from tract number to population of the tract to which this coordinate belongs
-
-    tract = xy_to_tract_num(longitude, latitude)
-    if len(tract) == 0:
-        return None
-    tract_no = tract[0]
-    subtract_no = tract_no.replace(
-        tract_no[len(tract_no) - 1], '0').replace(tract_no[len(tract_no) - 2], '0')
     ret = {}
 
-    for tr in population_data:
-        print(tr[4])
-        if tr[4] == tract_no or tr[4] == subtract_no:
-            ret[tr[4]] = tr[0]
+    tracts = xy_to_tract_num(longitude, latitude)
+    if len(tracts) == 0:
+        return ret
+
+    for tract_no in tracts:
+        subtract_no = tract_no.replace(
+            tract_no[len(tract_no) - 1], '0').replace(tract_no[len(tract_no) - 2], '0')
+
+        for tr in population_data:
+            print(tr[4])
+            if tr[4] == tract_no or tr[4] == subtract_no:
+                ret[tr[4]] = tr[0]
 
     return ret
+
+print(xy_to_tract_population(-122.323579, 47.721301))
