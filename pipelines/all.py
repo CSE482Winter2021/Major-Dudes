@@ -1,10 +1,11 @@
 from tqdm import tqdm
 
-import pipelines.p1_xy_to_stop as p1
-import pipelines.p2_prep_apc as p2
-import pipelines.p3_aggregate_apc as p3
+import pipelines.p1_orca_by_stop as p1
+import pipelines.p2_orca_by_route as p2
+import pipelines.p3_prep_apc as p3
+import pipelines.p4_aggregate_apc as p4
 
-PIPELINES = [p1, p2, p3]
+PIPELINES = [p1, p2, p3, p4]
 
 
 def run_all():
