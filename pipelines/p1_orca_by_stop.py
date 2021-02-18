@@ -5,6 +5,7 @@ import numpy as np
 import sklearn.neighbors as knn
 from tqdm import tqdm
 
+from scripts.census_reader import CensusReader
 from utils import constants
 
 NAME = 'p1_orca_by_stop'
@@ -73,6 +74,36 @@ def reduce_stop_df(stop_df):
     return pd.DataFrame(result, columns=['stop_id'] + col_keys)
 
 
+def add_census_data(stop_df):
+    """
+    Maps each stop to its corresponding tract.
+    TODO finish
+    """
+
+    # result = []
+
+    reader = CensusReader()
+    tracts_not_found = 0
+    pops_not_found = 0
+    for row in tqdm(stop_df.to_numpy(), desc="Loading census data"):
+        lon, lat = (row[1], row[2])
+        tract = reader.xy_to_tract_num(lon, lat)
+
+        if tract == -1:
+            tracts_not_found += 1
+
+        if tract != -1:
+            pop = reader.get_tract_pop(tract)
+
+            if pop == -1:
+                tqdm.write(tract)
+                pops_not_found += 1
+
+    print(f'bad tracts: {tracts_not_found}, bad pops: {pops_not_found}')
+
+    return stop_df
+
+
 def map_nearest_neighbors(orca_df, stop_df):
     """
     Find the stop ID and route number for each entry in orca_df by the nearest
@@ -132,6 +163,7 @@ def run_pipeline():
     # Run pipeline
     orca_df, stop_df = load_inputs()
     stop_df = reduce_stop_df(stop_df)
+    stop_df = add_census_data(stop_df)
     merged_df = map_nearest_neighbors(orca_df, stop_df)
 
     # Write CSV
