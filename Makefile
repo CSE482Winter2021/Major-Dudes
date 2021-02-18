@@ -15,13 +15,16 @@ bootstrap:
 
 # Pipelines
 p1:
-	@python3.9 pipelines/p1_xy_to_stop.py
+	@python3.9 pipelines/p1_orca_by_stop.py
 
 p2:
-	@python3.9 pipelines/p2_prep_apc.py
+	@python3.9 pipelines/p2_orca_by_route.py
 
 p3:
-	@python3.9 pipelines/p3_aggregate_apc.py
+	@python3.9 pipelines/p3_prep_apc.py
+
+p4:
+	@python3.9 pipelines/p4_aggregate_apc.py
 
 # Run all pipelines
 all:
