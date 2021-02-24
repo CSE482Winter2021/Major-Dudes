@@ -25,7 +25,7 @@ class CensusReader:
         ]
 
         # Maps seen points to their tract num
-        self.seen_points = dict()
+        self.seen_points = {}
 
         # Total population data
         with open(f'{CENSUS_DATA_DIR}/tract_population.json') as f:
@@ -107,8 +107,10 @@ class CensusReader:
         for i in range(len(income_data)):
             if i != 0:
                 tr = income_data[i]
-                tr_income_data = [int(tr[0]), int(tr[1]), int(tr[2]),
-                                  int(tr[3]), int(tr[4]), int(tr[5])]
+                tr_income_data = [
+                    int(tr[0]), int(tr[1]), int(tr[2]),
+                    int(tr[3]), int(tr[4]), int(tr[5])
+                ]
                 self.tract_income[tr[len(tr) - 1]] = tr_income_data
 
         # Disability data
@@ -121,9 +123,11 @@ class CensusReader:
         for i in range(len(disability_data)):
             if i != 0:
                 tr = disability_data[i]
-                tr_disability_data = [int(tr[0]) + int(tr[1]),
-                                      int(tr[3]) + int(tr[4]),
-                                      int(tr[6]) + int(tr[7])]
+                tr_disability_data = [
+                    int(tr[0]) + int(tr[1]),
+                    int(tr[3]) + int(tr[4]),
+                    int(tr[6]) + int(tr[7])
+                ]
                 self.tract_disability[tr[len(tr) - 1]] = tr_disability_data
 
     def xy_to_tract_num(self, longitude, latitude):
