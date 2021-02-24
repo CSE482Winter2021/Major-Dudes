@@ -5,6 +5,7 @@ import numpy as np
 import sklearn.neighbors as knn
 from tqdm import tqdm
 
+from scripts.census_reader import CensusReader
 from utils import constants
 
 NAME = 'p1_orca_by_stop'
@@ -73,6 +74,45 @@ def reduce_stop_df(stop_df):
     return pd.DataFrame(result, columns=['stop_id'] + col_keys)
 
 
+def add_census_data(stop_df):
+    """
+    Maps each stop to its corresponding tract.
+    """
+
+    result = []
+
+    reader = CensusReader()
+    bad_tracts = 0
+    bad_pops = 0
+    for row in tqdm(stop_df.to_numpy(), desc="Loading census data"):
+        lon, lat = (row[1], row[2])
+        tract = reader.xy_to_tract_num(lon, lat)
+
+        if tract == -1:
+            bad_tracts += 1
+
+        else:
+            pop = reader.get_tract_pop(tract)
+
+            if pop == -1:
+                bad_pops += 1
+
+            else:
+                # The row is good
+                result_row = np.concatenate((row, [tract, pop]))
+                result.append(result_row)
+
+    # Bad pops tracts typically mean that the point falls outside of King
+    # County. Not a huge deal. Bad pops, on the other hand, means that the
+    # point was found within a King County tract, but no population data was
+    # found for this tract. This is bad, but it might not be a huge deal. For
+    # now, we're just deleting rows corresponding to bad pops/tracts.
+    print(f'bad tracts: {bad_tracts}, bad pops: {bad_pops}')
+
+    cols = list(stop_df.columns) + ['tract_num', 'tract_population']
+    return pd.DataFrame(result, columns=cols)
+
+
 def map_nearest_neighbors(orca_df, stop_df):
     """
     Find the stop ID and route number for each entry in orca_df by the nearest
@@ -93,7 +133,6 @@ def map_nearest_neighbors(orca_df, stop_df):
     stop_arr = stop_df.to_numpy()
     ids = []
 
-    # Run 1nn over dataset
     n = len(orca_arr)
     for i in tqdm(range(n), desc='Calculating nearest neighbors'):
         o_row = orca_arr[i]
@@ -106,20 +145,18 @@ def map_nearest_neighbors(orca_df, stop_df):
         nn_index = nn_index[0]
 
         s_row = stop_arr[nn_index][0]
-        ids.append((s_row[0], s_row[3]))  # stop_id, route_ids
 
-    # Merge orca and stop datasets
+        # stop_id, route_ids, tract_num, tract_population
+        ids.append((s_row[0], s_row[3], s_row[4], s_row[5]))
+
     merged_arr = []
-    for i in tqdm(range(n), desc='Merging datasets'):
-        route_id, stop_id = ids[i]
-        merged_row = np.copy(orca_arr[i])
-        merged_row = np.append(merged_row, route_id)
-        merged_row = np.append(merged_row, stop_id)
+    for i in range(n):
+        merged_row = list(orca_arr[i]) + list(ids[i])
         merged_arr.append(merged_row)
 
-    cols = np.copy(orca_df.columns)
-    cols = np.append(cols, 'stop_id')
-    cols = np.append(cols, 'route_ids')
+    cols = list(orca_df.columns) + [
+        'stop_id', 'route_ids', 'tract_num', 'tract_population'
+    ]
     return pd.DataFrame(merged_arr, columns=cols)
 
 
@@ -132,6 +169,7 @@ def run_pipeline():
     # Run pipeline
     orca_df, stop_df = load_inputs()
     stop_df = reduce_stop_df(stop_df)
+    stop_df = add_census_data(stop_df)
     merged_df = map_nearest_neighbors(orca_df, stop_df)
 
     # Write CSV
