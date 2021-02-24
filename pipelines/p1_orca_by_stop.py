@@ -102,7 +102,7 @@ def add_census_data(stop_df):
                 result_row = np.concatenate((row, [tract, pop]))
                 result.append(result_row)
 
-    # Bad pops tracts typically mean that the point falls outside of King
+    # Bad tracts typically mean that the point falls outside of King
     # County. Not a huge deal. Bad pops, on the other hand, means that the
     # point was found within a King County tract, but no population data was
     # found for this tract. This is bad, but it might not be a huge deal. For

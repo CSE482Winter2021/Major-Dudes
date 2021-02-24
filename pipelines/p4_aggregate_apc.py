@@ -10,7 +10,7 @@ NAME = 'p3_aggregate_apc.py'
 SEASON = 'winter'
 INTERVAL = 'hr'
 
-OUTPUT_FILENAME = f'p3_{INTERVAL}_{SEASON}.csv'  # TODO better name
+OUTPUT_FILENAME = f'p3_apc_{INTERVAL}_{SEASON}.csv'
 WRITE_DIR = constants.PIPELINE_OUTPUTS_DIR
 
 

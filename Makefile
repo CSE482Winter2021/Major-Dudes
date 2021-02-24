@@ -18,7 +18,7 @@ p1:
 	@python3.9 pipelines/p1_orca_by_stop.py
 
 p2:
-	@python3.9 pipelines/p2_orca_by_route.py
+	@python3.9 pipelines/p2_aggregate_orca.py
 
 p3:
 	@python3.9 pipelines/p3_prep_apc.py
