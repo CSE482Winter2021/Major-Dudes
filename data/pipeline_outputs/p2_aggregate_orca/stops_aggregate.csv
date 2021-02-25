@@ -1,4 +1,4 @@
-stop_id,boarding_count,route_ids,tract_num,tract_population
+stop_id,orca_count,route_ids,tract_num,tract_population
 59033,56,{186},31400,6134
 99474,25,{186},31400,6134
 59032,139,{186},31400,6134

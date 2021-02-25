@@ -41,6 +41,8 @@ def aggregate_stops(orca_df):
             rows[cols[4]].iat[0],
         ])
 
+    # Renaming 'boarding_count' to 'orca_count' for clarity
+    cols[1] = 'orca_count'
     return pd.DataFrame(result, columns=cols)
 
 
