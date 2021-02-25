@@ -4,7 +4,7 @@ import pandas as pd
 
 from pipelines.p3_prep_apc import WRITE_DIR as p3_write_dir
 from pipelines.p2_aggregate_orca import WRITE_DIR as p2_write_dir
-from utils import constants, data_utils
+from utils import constants
 
 NAME = 'p4_aggregate_apc'
 
