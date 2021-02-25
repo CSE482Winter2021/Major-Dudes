@@ -14,6 +14,7 @@ bootstrap:
 	@find . -type d -name '*.egg-info' -prune -exec rm -rf {} \;
 
 # Pipelines
+
 p1:
 	@python3.9 pipelines/p1_orca_by_stop.py
 
@@ -25,6 +26,9 @@ p3:
 
 p4:
 	@python3.9 pipelines/p4_aggregate_apc.py
+
+p5:
+	@python3.9 pipelines/p5_orca_rates.py
 
 # Run all pipelines
 all:
