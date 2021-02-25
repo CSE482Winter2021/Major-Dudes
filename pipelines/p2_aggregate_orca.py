@@ -36,9 +36,9 @@ def aggregate_stops(orca_df):
         result.append([
             stop,
             rows[cols[1]].sum(),
-            rows[cols[2]].iloc[0],
-            rows[cols[3]].iloc[0],
-            rows[cols[4]].iloc[0],
+            rows[cols[2]].iat[0],
+            rows[cols[3]].iat[0],
+            rows[cols[4]].iat[0],
         ])
 
     return pd.DataFrame(result, columns=cols)

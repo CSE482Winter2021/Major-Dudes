@@ -175,9 +175,9 @@ def run_pipeline():
     # Write CSV
     if not os.path.exists(WRITE_DIR):
         os.mkdir(WRITE_DIR)
-    fname = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
-    merged_df.to_csv(fname, index=False)
-    tqdm.write(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
+    fpath = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
+    merged_df.to_csv(fpath, index=False)
+    print(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
 
 
 if __name__ == '__main__':
