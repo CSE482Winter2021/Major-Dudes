@@ -102,7 +102,7 @@ def add_census_data(stop_df):
                 result_row = np.concatenate((row, [tract, pop]))
                 result.append(result_row)
 
-    # Bad pops tracts typically mean that the point falls outside of King
+    # Bad tracts typically mean that the point falls outside of King
     # County. Not a huge deal. Bad pops, on the other hand, means that the
     # point was found within a King County tract, but no population data was
     # found for this tract. This is bad, but it might not be a huge deal. For
@@ -175,9 +175,9 @@ def run_pipeline():
     # Write CSV
     if not os.path.exists(WRITE_DIR):
         os.mkdir(WRITE_DIR)
-    fname = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
-    merged_df.to_csv(fname, index=False)
-    tqdm.write(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
+    fpath = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
+    merged_df.to_csv(fpath, index=False)
+    print(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
 
 
 if __name__ == '__main__':
