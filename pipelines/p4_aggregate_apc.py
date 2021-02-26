@@ -29,12 +29,7 @@ def load_input():
     # Filter data
     apc_df = apc_df[apc_df['region'] != 'Express']
     apc_df = apc_df[apc_df['orca_total'] > 0]
-    apc_df = apc_df[~apc_df['rte'].isin(
-        set.difference(
-            set(apc_df['rte']),
-            set(route_df['route_id']),
-        ))
-    ]
+    apc_df = apc_df[apc_df['rte'].isin(set(route_df['route_id']))]
 
     apc_df = apc_df.reset_index(drop=True)
     return apc_df
