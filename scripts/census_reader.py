@@ -110,9 +110,8 @@ class CensusReader:
         for i in range(len(disability_data)):
             if i != 0:
                 tr = disability_data[i]
-                tr_disability_data = [int(tr[0]) + int(tr[1]), 
-                                      int(tr[3]) + int(tr[4]), 
-                                      int(tr[6]) + int(tr[7])]
+                tr_disability_data = [int(tr[0]) + int(tr[3]) + int(tr[6]), 
+                                      int(tr[1]) + int(tr[4]) + int(tr[7])]
                 self.tract_disability[tr[len(tr) - 1]] = tr_disability_data
 
     def xy_to_tract_num(self, longitude, latitude):
@@ -152,11 +151,117 @@ class CensusReader:
         if tract in self.tract_pops:
             return self.tract_pops[tract]
 
-        supertract = tract\
-            .replace(tract[len(tract) - 1], '0')\
-            .replace(tract[len(tract) - 2], '0')
+        supertract = tract[:len(tract) - 2] + '00'
 
         if supertract in self.tract_pops:
             return self.tract_pops[supertract]
 
         return -1
+
+    def get_tract_age_pop(self, tract):
+        """
+        ARGS:
+        tract or subtract number
+
+        Returns an array of populations per age group of the given tract, 
+        or the tract containing the given subtract. If not found, returns empty list.
+        The list is in the following form:
+        [< 5, 5-9, 10-14, 15-17, 18-19, 20, 21, 22-24, 25-29, 30-34, 35-39, 40-44, 
+        45-49, 50-54, 55-59, 60-61, 62-64, 65-66, 67-69, 70-74, 75-79, 80-84, 85+]
+        """
+
+        if tract in self.tract_age:
+            return self.tract_age[tract]
+
+        supertract = tract[:len(tract) - 2] + '00'
+        
+        if supertract in self.tract_age:
+            return self.tract_age[supertract]
+
+        return []
+        
+    def get_tract_gender_pop(self, tract):
+        """
+        ARGS:
+        tract or subtract number
+
+        Returns a list of populations per gender of the given tract, 
+        or the tract containing the given subtract. If not found, returns empty list.
+        The list is in the following form:
+        [Population Male, Population Female]
+        """
+
+        if tract in self.tract_gender:
+            return self.tract_gender[tract]
+
+        supertract = tract[:len(tract) - 2] + '00'
+
+        if supertract in self.tract_gender:
+            return self.tract_gender[supertract]
+
+        return []
+
+    def get_tract_race_pop(self, tract):
+        """
+        ARGS:
+        tract or subtract number
+
+        Returns a list of populations per race of the given tract, 
+        or the tract containing the given subtract. If not found, returns empty list.
+        The list is in the following form:
+        [ White Only, Black Only, Native Only, Asian Only, Hawaiian/Pacific Islander Only, 
+          Other Only, Multiracial White, Multiracial Black, Multiracial Native, 
+          Multiracial Asian, Multiracial Hawaiian/Pacific Islander, Multiracial Other ]
+        """
+
+        if tract in self.tract_race:
+            return self.tract_race[tract]
+
+        supertract = tract[:len(tract) - 2] + '00'
+
+        if supertract in self.tract_race:
+            return self.tract_race[supertract]
+
+        return []
+
+    def get_tract_disabled_pop(self, tract):
+        """
+        ARGS:
+        tract or subtract number
+
+        Returns a list of populations with one disability and 2+ disabilities of the given tract, 
+        or the tract containing the given subtract. If not found, returns empty list.
+        The list is in the following form:
+        [1 disability, 2+ disabilities]
+        """
+
+        if tract in self.tract_disability:
+            return self.tract_disability[tract]
+
+        supertract = tract[:len(tract) - 2] + '00'
+
+        if supertract in self.tract_disability:
+            return self.tract_disability[supertract]
+
+        return []
+
+    def get_tract_income_pop(self, tract):
+        """
+        ARGS:
+        tract or subtract number
+
+        Returns a list of populations in different income ranges of the given tract, 
+        or the tract containing the given subtract. If not found, returns empty list.
+        The list is in the following form:
+        [<10k, 10000-19999, 20000-34999, 35000-49999, 50000-74999, 75000+]
+        """
+
+        if tract in self.tract_income:
+            return self.tract_income[tract]
+
+        supertract = tract[:len(tract) - 2] + '00'
+
+        if supertract in self.tract_income:
+            return self.tract_income[supertract]
+
+        return []
