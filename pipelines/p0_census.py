@@ -9,12 +9,13 @@ from utils import constants
 import pygeohash
 from shapely.geometry import shape, Point
 
-CENSUS_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data')
+CENSUS_RAW_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'raw_data')
+CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
 
-with open(f'{CENSUS_DATA_DIR}/tracts_2020.geojson', 'r') as f:
+with open(f'{CENSUS_RAW_DATA_DIR}/tracts_2020.geojson', 'r') as f:
     geo_js = json.load(f)
 
-with open(f'{CENSUS_DATA_DIR}/tract_population.json') as f:
+with open(f'{CENSUS_RAW_DATA_DIR}/tract_population.json') as f:
     pop_data = json.load(f)
 
 pop_data = pop_data[1:]
@@ -29,7 +30,7 @@ for i in range(len(pop_data)):
     else:
         super_tract_pops[tr[3][0:4]] = [tr[3]]
 
-with open(f'{CENSUS_DATA_DIR}/race_data.json') as f:
+with open(f'{CENSUS_RAW_DATA_DIR}/race_data.json') as f:
     race_data = json.load(f)
 race_data = race_data[1:]
 # Map from tract num to list:
@@ -53,7 +54,7 @@ for i in range(len(race_data)):
     tract_race[tr[len(tr) - 1]] = tr_race_data
 
 # Gender & Age data
-with open(f'{CENSUS_DATA_DIR}/gender_data.json') as f:
+with open(f'{CENSUS_RAW_DATA_DIR}/gender_data.json') as f:
     gender_data = json.load(f)
 gender_data = gender_data[1:]
 tract_gender = {}
@@ -79,7 +80,7 @@ for i in range(len(gender_data)):
     tract_age[tr[len(tr) - 1]] = tr_age_data
 
 # Income data
-with open(f'{CENSUS_DATA_DIR}/income_data.json') as f:
+with open(f'{CENSUS_RAW_DATA_DIR}/income_data.json') as f:
     income_data = json.load(f)
 income_data = income_data[1:]
 # Map from tract num to list:
@@ -94,7 +95,7 @@ for i in range(len(income_data)):
     tract_income[tr[len(tr) - 1]] = tr_income_data
 
 # Disability data
-with open(f'{CENSUS_DATA_DIR}/disabilities_data.json') as f:
+with open(f'{CENSUS_RAW_DATA_DIR}/disabilities_data.json') as f:
     disability_data = json.load(f)
 disability_data = disability_data[1:]
 
@@ -190,17 +191,10 @@ for supertract_list in s_to_tract:
                 new_geo_js['features'].append(new_feature)
                 tract_to_demos[feature['properties']['TRACTCE20']] = {'name': feature['properties']['NAME20'], 'population': tract_pops[feature['properties']['TRACTCE20']], 'race': tract_race[feature['properties']['TRACTCE20']], 'gender': tract_gender[feature['properties']['TRACTCE20']], 'age': tract_age[feature['properties']['TRACTCE20']], 'income': tract_income[feature['properties']['TRACTCE20']], 'disability': tract_disability[feature['properties']['TRACTCE20']]}
 
-with open('tracts_demographics.geojson', 'w') as outfile:
+with open(f'{CENSUS_OUTPUT_DATA_DIR}/tracts_demographics.geojson', 'w') as outfile:
     json.dump(new_geo_js, outfile)
 outfile.close()
 
-with open('tract_to_demographics.json', 'w') as outfile:
+with open(f'{CENSUS_OUTPUT_DATA_DIR}/tract_to_demographics.json', 'w') as outfile:
     json.dump(tract_to_demos, outfile)
 outfile.close()
-
-# print(super_tract_pops)
-# poly1 = shape(geo_js['features'][0]['geometry'])
-# poly2 = shape(geo_js['features'][1]['geometry'])
-
-# mergedPolygon = poly1.union(poly2)
-# geojson_out = geojson.Feature(geometry=mergedPolygon, properties={})
