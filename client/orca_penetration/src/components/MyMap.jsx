@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { MapContainer as Map, GeoJSON } from "react-leaflet";
-import mapData from "../tracts_2020.json";
+// import mapData from "../tracts_2020.json";
+import mapData from "../tracts_demographics.json";
 import "leaflet/dist/leaflet.css";
 import "./MyMap.css";
 
@@ -13,9 +14,26 @@ class MyMap extends Component {
   };
 
   onEachTract = (tract, layer) => {
-    const tractName = tract.properties.TRACTCE20;
+    const tractName = tract.properties.TRACT_NAME;
+    const tractPopulation = tract.properties.POPULATION;
+    const tractRace = tract.properties.RACE;
+    const tractGender = tract.properties.GENDER;
+    const tractAge = tract.properties.AGE;
+    const tractIncome = tract.properties.INCOME;
+    const tractDisability = tract.properties.DISABILITY;
+
+
+    let popup = {
+      'tract' : tractName,
+      'population' : tractPopulation,
+      'race' : tractRace,
+      'gender' : tractGender,
+      'age' : tractAge,
+      'income' : tractIncome,
+      'disabiliy' : tractDisability
+    }
     console.log(tractName);
-    layer.bindPopup(tractName);
+    layer.bindPopup(JSON.stringify(popup));
 
     layer.options.fillOpacity = 0.4;
 
@@ -23,7 +41,7 @@ class MyMap extends Component {
       this.openPopup();
     });
     layer.on('mouseout', function (e) {
-        this.closePopup();
+      this.closePopup();
     });
   };
 
