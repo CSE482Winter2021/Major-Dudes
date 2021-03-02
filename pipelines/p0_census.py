@@ -141,7 +141,7 @@ for supertract_list in s_to_tract:
         population = 0
         race = [0,0,0,0,0,0,0,0,0,0,0,0]
         gender = [0,0]
-        age = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        age = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         income = [0,0,0,0,0,0]
         disabilities = [0,0]
         for sub in supertract_list:
@@ -164,28 +164,72 @@ for supertract_list in s_to_tract:
             curr_geom = shape(feature['geometry'])
             merged = geom.union(curr_geom)
             new_feature = geojson.Feature(id=supertract, properties={}, geometry=merged)
-        new_feature['properties']['TRACT_NAME'] = str(int(supertract[0:4]))
+        # new_feature['properties']['TRACT NUMBER'] = str(int(supertract[0:4]))
+        # new_feature['properties']['POPULATION'] = population
+        # new_feature['properties']['RACE'] = race
+        # new_feature['properties']['GENDER'] = gender
+        # new_feature['properties']['AGE'] = age
+        # new_feature['properties']['INCOME'] = income
+        # new_feature['properties']['DISABILITY'] = disabilities
+
+        new_feature['properties']['TRACT NUMBER'] = str(int(supertract[0:4]))
         new_feature['properties']['POPULATION'] = population
-        new_feature['properties']['RACE'] = race
-        new_feature['properties']['GENDER'] = gender
-        new_feature['properties']['AGE'] = age
-        new_feature['properties']['INCOME'] = income
-        new_feature['properties']['DISABILITY'] = disabilities
+        new_feature['properties']['MALE'] = gender[0]
+        new_feature['properties']['FEMALE'] = gender[1]
+        new_feature['properties']['UNDER 18'] = age[0] + age[1] + age[2] + age[3]
+        new_feature['properties']['18 - 29'] = age[4] + age[5] + age[6] + age[7] + age[8]
+        new_feature['properties']['30 - 39'] = age[9] + age[10]
+        new_feature['properties']['40 - 49'] = age[11] + age[12]
+        new_feature['properties']['50 - 59'] = age[13] + age[14]
+        new_feature['properties']['60 - 69'] = age[15] + age[16] + age[17] + age[18]
+        new_feature['properties']['ABOVE 70'] = age[19] + age[20] + age[21] + age[22]
+        new_feature['properties']['WHITE'] = race[0] + race[6]
+        new_feature['properties']['BLACK'] = race[1] + race[7]
+        new_feature['properties']['NATIVE'] = race[2] + race[8]
+        new_feature['properties']['ASIAN'] = race[3] + race[9]
+        new_feature['properties']['PACIFIC ISLANDER'] = race[4] + race[10]
+        new_feature['properties']['OTHER'] = race[5] + race[11]
+        new_feature['properties']['LESS THAN $10K'] = income[0]
+        new_feature['properties']['$10K - $20K'] = income[1]
+        new_feature['properties']['$20K - $35K'] = income[2]
+        new_feature['properties']['$35K - $50K'] = income[3]
+        new_feature['properties']['$50K - $75K'] = income[4]
+        new_feature['properties']['GREATER THAN $75K'] = income[5]
+        new_feature['properties']['DISABLED'] = disabilities[0] + disabilities[1]
 
         new_geo_js['features'].append(new_feature)
         tract_to_demos[supertract] = {'name': str(int(supertract[0:4])), 'population': population, 'race': race, 'gender': gender, 'age': age, 'income': income, 'disability': disabilities}
     else:
         for feature in geo_js['features']:
             if feature['properties']['TRACTCE20'] in s_to_tract[supertract_list]:
-                # print(feature['properties']['TRACTCE20'])
                 new_feature = geojson.Feature(id=feature['properties']['TRACTCE20'], properties={}, geometry=shape(feature['geometry']))
-                new_feature['properties']['TRACT_NAME'] = feature['properties']['NAME20']
+                new_feature['properties']['TRACT NUMBER'] = feature['properties']['NAME20']
                 new_feature['properties']['POPULATION'] = tract_pops[feature['properties']['TRACTCE20']]
-                new_feature['properties']['RACE'] = tract_race[feature['properties']['TRACTCE20']]
-                new_feature['properties']['GENDER'] = tract_gender[feature['properties']['TRACTCE20']]
-                new_feature['properties']['AGE'] = tract_age[feature['properties']['TRACTCE20']]
-                new_feature['properties']['INCOME'] = tract_income[feature['properties']['TRACTCE20']]
-                new_feature['properties']['DISABILITY'] = tract_disability[feature['properties']['TRACTCE20']]
+                new_feature['properties']['MALE'] = tract_gender[feature['properties']['TRACTCE20']][0]
+                new_feature['properties']['FEMALE'] = tract_gender[feature['properties']['TRACTCE20']][1]
+                tr_age = tract_age[feature['properties']['TRACTCE20']]
+                new_feature['properties']['UNDER 18'] = tr_age[0] + tr_age[1] + tr_age[2] + tr_age[3]
+                new_feature['properties']['18 - 29'] = tr_age[4] + tr_age[5] + tr_age[6] + tr_age[7] + tr_age[8]
+                new_feature['properties']['30 - 39'] = tr_age[9] + tr_age[10]
+                new_feature['properties']['40 - 49'] = tr_age[11] + tr_age[12]
+                new_feature['properties']['50 - 59'] = tr_age[13] + tr_age[14]
+                new_feature['properties']['60 - 69'] = tr_age[15] + tr_age[16] + tr_age[17] + tr_age[18]
+                new_feature['properties']['ABOVE 70'] = tr_age[19] + tr_age[20] + tr_age[21] + tr_age[22]
+                tr_race = tract_race[feature['properties']['TRACTCE20']]
+                new_feature['properties']['WHITE'] = tr_race[0] + tr_race[6]
+                new_feature['properties']['BLACK'] = tr_race[1] + tr_race[7]
+                new_feature['properties']['NATIVE'] = tr_race[2] + tr_race[8]
+                new_feature['properties']['ASIAN'] = tr_race[3] + tr_race[9]
+                new_feature['properties']['PACIFIC ISLANDER'] = tr_race[4] + tr_race[10]
+                new_feature['properties']['OTHER'] = tr_race[5] + tr_race[11]
+                tr_income = tract_income[feature['properties']['TRACTCE20']]
+                new_feature['properties']['LESS THAN $10K'] = tr_income[0]
+                new_feature['properties']['$10K - $20K'] = tr_income[1]
+                new_feature['properties']['$20K - $35K'] = tr_income[2]
+                new_feature['properties']['$35K - $50K'] = tr_income[3]
+                new_feature['properties']['$50K - $75K'] = tr_income[4]
+                new_feature['properties']['GREATER THAN $75K'] = tr_income[5]
+                new_feature['properties']['DISABLED'] = tract_disability[feature['properties']['TRACTCE20']][0] + tract_disability[feature['properties']['TRACTCE20']][1]
 
                 new_geo_js['features'].remove(feature)
                 new_geo_js['features'].append(new_feature)
