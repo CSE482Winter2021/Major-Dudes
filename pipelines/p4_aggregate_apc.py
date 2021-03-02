@@ -27,9 +27,9 @@ def load_input():
     route_df = pd.read_csv(path2)
 
     # Filter data
-    apc_df = apc_df[apc_df['region'] != 'Express']
+    # apc_df = apc_df[apc_df['region'] != 'Express']
     apc_df = apc_df[apc_df['orca_total'] > 0]
-    apc_df = apc_df[apc_df['rte'].isin(set(route_df['route_id']))]
+    # apc_df = apc_df[apc_df['rte'].isin(set(route_df['route_id']))]
 
     apc_df = apc_df.reset_index(drop=True)
     return apc_df
