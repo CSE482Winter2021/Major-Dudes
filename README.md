@@ -13,8 +13,8 @@ Repository for Major Dudes
 ### Misc
 * Since we don't have CI right now, make sure to run `make` before committing/pushing, and resolve any errors
 
-### Calculation of By-Stop ORCA Penetration Rates
-
-![rates-1](img/rates-1.png)
-
-![rates-2](img/rates-2.png)
+<object data="docs/r-final-calculation.pdf" type="application/pdf" width="750px" height="750px">
+    <embed src="docs/r-final-calculation.pdf" type="application/pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="docs/r-final-calculation.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
