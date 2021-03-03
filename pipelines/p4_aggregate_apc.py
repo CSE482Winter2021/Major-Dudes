@@ -3,15 +3,14 @@ import os
 import pandas as pd
 
 from pipelines.p3_prep_apc import WRITE_DIR as p3_write_dir
-from pipelines.p2_aggregate_orca import WRITE_DIR as p2_write_dir
 from utils import constants
 
 NAME = 'p4_aggregate_apc'
 
 SEASON = 'winter'
-INTERVAL = 'hr'
+INTERVAL = '15min'
 
-OUTPUT_FILENAME = f'p4_apc_aggregate_{INTERVAL}_{SEASON}.csv'
+OUTPUT_FILENAME = f'p4_apc_aggregate.csv'
 WRITE_DIR = constants.PIPELINE_OUTPUTS_DIR
 
 
@@ -22,14 +21,10 @@ def load_input():
 
     # Load data
     path1 = os.path.join(p3_write_dir, f'p3_apc_{SEASON}_{INTERVAL}.csv.gz')
-    path2 = os.path.join(p2_write_dir, 'routes_aggregate.csv')
     apc_df = pd.read_csv(path1, compression='gzip')
-    route_df = pd.read_csv(path2)
 
     # Filter data
-    # apc_df = apc_df[apc_df['region'] != 'Express']
     apc_df = apc_df[apc_df['orca_total'] > 0]
-    # apc_df = apc_df[apc_df['rte'].isin(set(route_df['route_id']))]
 
     apc_df = apc_df.reset_index(drop=True)
     return apc_df

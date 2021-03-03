@@ -8,14 +8,14 @@ from utils import constants
 NAME = 'p3_prep_apc'
 
 INTERVALS = [
-    # '15min',
+    '15min',
     '30min',
     'ampm',
     'day',
     'hr',
 ]
 SEASONS = [
-    # 'combined',
+    'combined',
     'summer',
     'winter',
 ]

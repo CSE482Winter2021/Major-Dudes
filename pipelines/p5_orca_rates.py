@@ -14,7 +14,7 @@ NAME = 'p5_orca_rates'
 OUTPUT_FILENAME = f'{NAME}.csv'
 WRITE_DIR = constants.PIPELINE_OUTPUTS_DIR
 
-TOLERANCE_INTERVAL = [0.02, 1]
+TOLERANCE_INTERVAL = [0.1, 1]
 
 
 def load_input():
@@ -62,10 +62,7 @@ def attach_r_initial(stops_df, apc_df):
     stops = {
         x[0]: {
             'orca_count': x[1],
-            'route_ids': {
-                x for x in x[2]
-                # if x in routes
-            },
+            'route_ids': x[2],
             'tract_num': x[3],
             'tract_population': x[4]
         }
@@ -99,20 +96,14 @@ def attach_r_final(stops_df, routes_df, apc_df):
     Calculates r_final.
     """
 
-    # key: stop_id
-    stops_map = {
-        x[0]: (x[1], x[2], x[3], x[4], x[5])
-        for x in stops_df.to_numpy()
-    }
+    # stop_id: (observed orca count, tract population)
+    stops_map = {x[0]: (x[1], x[4]) for x in stops_df.to_numpy()}
 
-    # key: route_id
-    apc_map = {
-        x[0]: (x[1], x[2], x[3])
-        for x in apc_df.to_numpy()
-    }
+    # route_id: (n_apc, n_orca, orca_rate)
+    apc_map = {x[0]: (x[1], x[2], x[3]) for x in apc_df.to_numpy()}
 
-    # key: stop_id
     r_final_map = dict()
+    error = np.array([])
 
     for row in routes_df.to_numpy():
         route, stops = (row[0], list(row[1]))
@@ -121,39 +112,47 @@ def attach_r_final(stops_df, routes_df, apc_df):
         if not stops:
             continue  # This only happens for 1 of the 155 routes
 
-        m_hat = apc_map[route][2]  # target overall rate
-        o = np.array([])  # observed orca counts
-        p = np.array([])  # tract populations
+        r = apc_map[route][2]  # target overall rate
+        o = np.array([stops_map[x][0] for x in stops])  # observed orca counts
+        p = np.array([stops_map[x][1] for x in stops])  # tract populations
 
-        for stop in stops:
-            o_i, p_i = (stops_map[stop][0], stops_map[stop][3])
-            o = np.append(o, o_i)
-            p = np.append(p, p_i)
+        # The ORCA rate expected values at each stop
+        r_hat = r * (np.sum(p) * o) / (np.sum(o) * p)
 
-        m = np.sum(o) / np.sum(p)
-        c = m_hat / m
-        o_hat = c * o
+        error = np.append(error, np.array([np.abs(x - r) for x in r_hat]))
 
         for i, stop in enumerate(stops):
-            r = o_hat[i] / p[i]
-
-            r_final_map[stop] = np.average([r_final_map[stop], r]) \
-                if stop in r_final_map else r
+            r_final_map[stop] = np.average([r_final_map[stop], r_hat[i]]) \
+                if stop in r_final_map else r_hat[i]
 
     result = []
+    ignored, total = (0, 0)
     for row in stops_df.to_numpy():
         stop_id = row[0]
         tract_num = row[3]
+        tract_pop = row[4]
         r_initial = row[5]
         r_final = r_final_map[stop_id]
 
         if not TOLERANCE_INTERVAL[0] < r_final < TOLERANCE_INTERVAL[1]:
-            r_final = r_initial  # backoff if not within tolerance
+            r_final = r_initial  # backoff to r_inital if not within tolerance
+            ignored += 1
 
-        result.append([stop_id, tract_num, r_initial, r_final])
+        result.append([stop_id, tract_num, tract_pop, r_initial, r_final])
+        total += 1
 
-    cols = ['stop_id', 'tract_num', 'r_initial', 'r_final']
+    tqdm.write(f'MAE: {np.average(error)}')
+    tqdm.write(f'RMSE: {np.sqrt(np.average(error ** 2))}')
+    tqdm.write(f'Rate within tolerance: {(total - ignored) / total}')
+
+    cols = ['stop_id', 'tract_num', 'tract_population', 'r_initial', 'r_final']
     return pd.DataFrame(result, columns=cols)
+
+
+def aggregate_by_tracts(stops_df):
+    """
+    Aggregates r_final by tract.
+    """
 
 
 def run_pipeline():
