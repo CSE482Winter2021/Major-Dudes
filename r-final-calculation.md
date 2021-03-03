@@ -14,7 +14,7 @@ We want an estimator $\bold{\hat r}=[\hat r_1\cdots \hat r_n]$ which estimates t
 
 
 
-####Calculation
+#### Calculation
 
 Let:
 $$
@@ -53,6 +53,6 @@ $$
 $$
 where $D$ is the dataset containing each route $R$, each with a unique $r_R$ and $\hat{\bold r}$.
 
-Using the winter APC counts data with a 15 minute time interval, we calculated an MAE of **1.082** and an RMSE of **4.113**. Approximately 46% of the predicted by-stop ORCA rate estimates fell within the tolerance interval [0.1, 1]. For the points that fell outside of this interval, we threw them out and replaced them with their corresponding $r$ value, averaged across each route travelling through the stop and weighted by the routes' APC counts. Note that these error values were calculated before running the tolerance interval. 
+Using the winter APC counts data with a 15 minute time interval, we calculated an MAE of **1.082** and an RMSE of **4.113**. Approximately 46% of the predicted by-stop ORCA rate estimates fell within the tolerance interval [0.1, 1]. For the points that fell outside of this interval, we threw them out and replaced them with their corresponding $r$ value, averaged across each route travelling through the stop and weighted by the routes' APC counts. Note that these error values were calculated before running the tolerance interval.
 
 Although only 46% of our estimates fell within a reasonable interval, we believe that this estimation model is still quite robust given the data to which we have access, and the relatively high MAE and RMSE values indicate that we've captured a good amount of ORCA rate variance within routes.
