@@ -36,6 +36,11 @@ c = \frac{r_R\sum_{i=1}^{n}p_i}{\sum_{i=1}^{n}o_i}\\\\
 $$
 
 
+
+
+
+
+
 #### Error Analysis
 
 Since the whole point of finding $\bold{\hat r}$ is to capture the variance of $r$ across the route, then we expect lots of variance among its values compared to $r$. Nonetheless, it is still useful to look at the error as a measure of how much variance we have.

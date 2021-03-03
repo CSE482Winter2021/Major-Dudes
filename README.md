@@ -12,3 +12,9 @@ Repository for Major Dudes
 
 ### Misc
 * Since we don't have CI right now, make sure to run `make` before committing/pushing, and resolve any errors
+
+### Calculation of By-Stop ORCA Penetration Rates
+
+![rates-1](img/rates-1.png)
+
+![rates-2](img/rates-2.png)
