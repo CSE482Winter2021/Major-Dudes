@@ -1,5 +1,3 @@
-# Calculation of By-Stop ORCA Rates
-
 #### Problem
 
 Given:
@@ -16,6 +14,7 @@ Unfortunately, we don't have data on observed APC counts by stop, but we do have
 
 **Formal assumption:** $\begin{pmatrix}\frac{o_1}{p_1}\cdots\frac{o_n}{p_n}\end{pmatrix}$ is linearly dependent with $\begin{pmatrix}\mathbb E[r_1]\cdots\mathbb E[r_n]\end{pmatrix}$. In other words, there is some constant scalar $c$ such that $\forall S_i \in R:\space \mathbb E \left[\frac{o_i}{\text{apc}_i}\right]= c\left(\frac{o_i}{p_i}\right)$.
 
+<div style="page-break-after: always; break-after: page;"></div>
 
 #### Calculation
 
