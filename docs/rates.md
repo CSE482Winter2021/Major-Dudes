@@ -3,16 +3,16 @@
 Given:
 
 * Route $X$ with stops $S_1\cdots S_n$
-* Total ORCA to APC rate $r_X=\frac{o_{\text{total}}}{\text{apc}_{\text{total}}}$ for the route
+* Total ORCA to APC rate $r_X=\frac{o_{\text{total}}}{a_{\text{total}}}$ for the route
 * Observed ORCA boarding count $o_i$ and census tract population $p_i$ for each $S_i\in X$
 
-We want an estimator $\bold{\hat r}=\begin{pmatrix}\mathbb E[r_1]\cdots\mathbb E[r_n]\end{pmatrix}$, where $r_i$ represents the ORCA rate $\frac{o_i}{\text{apc}_i}$ for each stop $S_i\in X$, such that $\sum_{i=1}^{n}\frac{o_i}{\text{apc}_i}=r_X$.
+We want to estimate the ORCA rate $\frac{o_i}{a_i}$ at each stop $S_i$, such that $\frac{\sum_{i=1}^{n}o_i}{\sum_{i=1}^{n}a_i}=r_X$. We can define our approximation as $\bold{\hat r}=\begin{pmatrix}\hat r_1\cdots \hat r_n\end{pmatrix}$, where $\hat r_i\approx \frac{o_i}{a_i}$.
 
 #### Assumptions
 
-Unfortunately, we don't have data on observed APC counts by stop, but we do have the populations of the census tracts within which each stop falls. Let's assume that comparing the observed ORCA count at a stop to the population of the stop's census tract is a good proxy for estimating the ORCA to APC rate. More specifically, the ORCA to population at each stop rate scales linearly with the EV of the ORCA to APC rate. This is a pretty flimsy assumption, but it's the best we can do given the data that we have.
+Unfortunately, we don't have data on observed APC counts by stop, but we do have the populations of the census tracts within which each stop falls. Let's assume that the population of a stop's tract is a good proxy for the number of APC boardings at that stop. More specifically, the APC count scales linearly with the tract population. This is a pretty flimsy assumption, but it's the best we can do given the data that we have.
 
-**Formal assumption:** $\begin{pmatrix}\frac{o_1}{p_1}\cdots\frac{o_n}{p_n}\end{pmatrix}$ is linearly dependent with $\begin{pmatrix}\mathbb E[r_1]\cdots\mathbb E[r_n]\end{pmatrix}$. In other words, there is some constant scalar $c$ such that $\forall S_i \in R:\space \mathbb E \left[\frac{o_i}{\text{apc}_i}\right]= c\left(\frac{o_i}{p_i}\right)$.
+**Formal assumption:** $\begin{pmatrix}p_1\cdots p_n\end{pmatrix}$ is linearly dependent with $\begin{pmatrix}a_1\cdots a_n\end{pmatrix}$. In other words, there is some constant scalar $c$ such that $\forall S_i \in X:\space\mathbb a_i = cp_i$.
 
 <div style="page-break-after: always; break-after: page;"></div>
 
@@ -22,17 +22,14 @@ Let:
 $$
 \bold o = \begin{pmatrix}o_1\cdots o_n\end{pmatrix}\qquad
 \bold p = \begin{pmatrix}p_1\cdots p_n\end{pmatrix}\qquad
-\bold{\hat r}' = \frac{\bold o}{\bold p}\qquad
 $$
 
-
-Under our assumption, $\bold{\hat r}'$ is linearly dependent with $\bold{\hat r}$, so there must be some $c$ such that $c\bold{\hat r}'=\bold{\hat r}$. Since we are given $r_X=\frac{o_{\text{total}}}{\text{apc}_{\text{total}}}$, we can use the definiton of $\hat{\bold r}$ to rewrite that $r_X$ as follows:
+Under our assumption, $\bold p$ is linearly dependent with $\begin{pmatrix}a_1\cdots a_n\end{pmatrix}$, so there must be some $c$ such that $\bold{\hat r}=\frac{\bold o}{c\bold p}$. Since we are given $r_X=\frac{o_{\text{total}}}{a_{\text{total}}}$, we can use our assumption to rewrite $r_X$ as follows:
 
 $$
-r_X = \mathbb E[r_X]
-= \mathbb E \left[\sum_{i=1}^{n}\frac{o_i}{\text{apc}_i}\right]
-= c\sum_{i=1}^{n}\left(\frac{o_i}{p_i}\right)
-,\text{ where }c\bold{\hat r}'=\bold{\hat r}
+r_X
+= \frac{\sum_{i=1}^{n}o_i}{\sum_{i=1}^{n}a_i}
+= \frac{\sum_{i=1}^{n}o_i}{c\sum_{i=1}^{n}p_i}
 $$
 
 Taking that definition of $r_X$, we can find $\bold{\hat r}$ as follows:
@@ -40,15 +37,12 @@ Taking that definition of $r_X$, we can find $\bold{\hat r}$ as follows:
 
 $$
 \begin{aligned}
-r_X &= c\sum_{i=1}^{n}\left(\frac{o_i}{p_i}\right) \quad\rarr\quad
-c = r_X\sum_{i=1}^{n}\left(\frac{p_i}{o_i}\right)\\\\
-\bold{\hat r} &= c\bold{\hat r}'
-=\left(
-r_X\sum_{i=1}^{n}\left(\frac{p_i}{o_i}\right)
-\right)\bold{\hat r}'
+r_X &= \frac{\sum_{i=1}^{n}o_i}{c  \sum_{i=1}^{n}p_i} \quad\rarr\quad
+c    = \frac{\sum_{i=1}^{n}o_i}{r_X\sum_{i=1}^{n}p_i}\\\\
+\bold{\hat r} &= \frac{\bold o}{c\bold p}
 =\frac
-  {\left(r_X\Sigma\bold p\right)\bold o}
-  {\left(\Sigma \bold o\right)\bold p}
+{\left(r_X\sum_{i=1}^{n}p_i\right)\bold o}
+{\left(   \sum_{i=1}^{n}o_i\right)\bold p}
 \end{aligned}
 $$
 
