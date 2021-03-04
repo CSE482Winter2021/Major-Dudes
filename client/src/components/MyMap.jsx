@@ -29,7 +29,7 @@ function onEachTract (tract, layer) {
 
   var dict = {}
 
-  dict['Tract Number'] = tract.properties.[ 'TRACT NUMBER'];
+  dict['Tract Number'] = tract.properties['TRACT NUMBER'];
   dict['Population']= tract.properties.POPULATION;
   dict['Male'] = tract.properties.MALE;
   dict['Female']= tract.properties.FEMALE;
@@ -37,7 +37,7 @@ function onEachTract (tract, layer) {
   dict['Black'] = tract.properties.BLACK;
   dict['Native']= tract.properties.NATIVE;
   dict['Asian'] = tract.properties.ASIAN;
-  dict['Pacific Islander'] = tract.properties.[ 'PACIFIC ISLANDER' ];
+  dict['Pacific Islander'] = tract.properties['PACIFIC ISLANDER'];
   dict['Other Race'] = tract.properties.OTHER;
   dict['Disabled'] = tract.properties.DISABLED;
 
@@ -76,7 +76,7 @@ function MyMap() {
             data={mapData.features}
             onEachFeature={onEachTract}
           />
-          
+
         </Map>
         <div className='rightCol'>
           This react app give population data about each census Tract as well as the expected ORCA penetration rate.

@@ -7,14 +7,21 @@ import './App.css';
 //   Switch,
 //   Redirect,
 // } from 'react-router-dom';
-// import Button from '@material-ui/core/Button/index';
+import Button from '@material-ui/core/Button/index';
 import MyMap from "./components/MyMap";
 
 class App extends Component {
   /* eslint-disable jsx-a11y/control-has-associated-label */
 
   render() {
-    return <MyMap />
+    return (
+      <div>
+        <MyMap />
+        <Button variant="contained" color="primary">
+          Primary
+        </Button>
+      </div>
+    );
   }
 }
 
