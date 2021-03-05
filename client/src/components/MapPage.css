@@ -1,0 +1,55 @@
+body {
+    background-color: rgb(178, 210, 222);
+}
+
+.container{
+    position: relative;
+    margin: 20px;
+}
+.leaflet-container {
+    margin: auto;
+    background:white;
+    z-index: 0;
+}
+.overlay {
+    /* transition: all 300ms; */
+    background:rgb(230, 230, 230);
+    padding:10px;
+    margin:auto;
+    color:black;
+    width: 20%;
+    height: auto; 
+    position: absolute;
+    top: 5%;
+    left: 75%;
+    z-index: 2;
+    border-radius: 25px;
+    opacity: .9;
+}
+.rowC{
+    display:flex; 
+    flex-direction:row;
+}
+.rightCol {
+    border:1px red solid;
+    padding:0;
+}
+
+.App {
+    text-align: center;
+    font-family: sans-serif;
+    width: 95%;
+    margin: auto;
+    position: relative;
+    /* display: flex; */
+    /* justify-content: center; */
+}
+
+.demo_table {
+    width: 100%;
+    text-align: left;
+}
+
+.italics {
+    font-style: oblique;
+  }

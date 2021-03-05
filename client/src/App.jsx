@@ -1,26 +1,33 @@
 import React, { Component } from 'react';
 import './App.css';
-// import {
-//   BrowserRouter as Router,
-//   Route,
-//   Link,
-//   Switch,
-//   Redirect,
-// } from 'react-router-dom';
-import Button from '@material-ui/core/Button/index';
-import MyMap from "./components/MyMap";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
+
+import MapPage from "./components/MapPage";
+import HomePage from "./components/HomePage";
+import Estimator from "./components/Estimator";
+import Nav from "./components/Nav";
 
 class App extends Component {
-  /* eslint-disable jsx-a11y/control-has-associated-label */
-
   render() {
     return (
-      <div>
-        <MyMap />
-        <Button variant="contained" color="primary">
-          Primary
-        </Button>
-      </div>
+      <Router>
+        <div className='App'>
+          <Nav />
+          <div>
+            <Switch>
+              <Route exact path='/' component={HomePage} />
+              <Route path='/Map' component={MapPage} />
+              <Route path='/Estimator' component={Estimator} />
+            </Switch>
+          </div>
+        </div>
+      </Router>
     );
   }
 }
