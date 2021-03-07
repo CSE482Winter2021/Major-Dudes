@@ -6,8 +6,6 @@ import mapData from "../tracts_demographics.json";
 import waterMap from "../water.json";
 import "leaflet/dist/leaflet.css";
 import "./MapPage.css";
-// import IconButton from 'material-ui/IconButton';
-import { CloseIcon } from '@material-ui/icons';
 import Button from '@material-ui/core/Button/index';
 
 const tractStyle = {
@@ -102,6 +100,7 @@ class MapPage extends Component {
   }
 
   getDemographics() {
+    // var react = new Parser();
     const demos = this.state;
     return (
       <div className='container'>
@@ -163,9 +162,6 @@ class MapPage extends Component {
               Close
             </Button>
           </div> : null}
-          {/* <Button>
-            Hello
-          </Button> */}
         </div>
       </div>
     );
