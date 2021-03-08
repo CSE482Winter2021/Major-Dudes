@@ -133,37 +133,34 @@ class MapPage extends Component {
   render() {
     const { clicked, tract_num } = this.state;
     return (
-      <div className="App">
-        <h1 className="App-header">King County Interactive Map</h1>
-        <div className='container'>
-          <div className='leaflet-container'>
-            <Map style={{ height: "90vh", width: "150vh" }} zoom={10} center={[47.45, -121.8]}>
-              <GeoJSON
-                style={tractStyle}
-                data={mapData.features}
-              />
-              <GeoJSON
-                style={waterStyle}
-                data={waterMap.features}
-              />
-              <GeoJSON
-                style={tractBorderStyle}
-                data={mapData.features}
-                onEachFeature={this.onEachTract}
-              />
-            </Map>
-          </div>
-          { clicked ? <div className='overlay'>
-            <h3>
-              Tract {tract_num} Demographics:
-            </h3>
-            <this.getDemographics />
-            <Button  margin="20px" onClick={this.unClicked} transitionDuration={0}>
-              Close
-            </Button>
-          </div> : null}
+      <div className="container">
+        <div className='leaflet-container'>
+          <Map style={{ height: "90vh", width: "150vh" }} zoom={10} center={[47.45, -121.8]}>
+            <GeoJSON
+              style={tractStyle}
+              data={mapData.features}
+            />
+            <GeoJSON
+              style={waterStyle}
+              data={waterMap.features}
+            />
+            <GeoJSON
+              style={tractBorderStyle}
+              data={mapData.features}
+              onEachFeature={this.onEachTract}
+            />
+          </Map>
         </div>
-      </div>
+        { clicked ? <div className='overlay'>
+          <h3>
+            Tract {tract_num} Demographics:
+          </h3>
+          <this.getDemographics />
+          <Button  margin="20px" onClick={this.unClicked} transitionDuration={0}>
+            Close
+          </Button>
+        </div> : null}
+    </div>
     );
   }
 }

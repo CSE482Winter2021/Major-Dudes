@@ -29,6 +29,7 @@ body {
 .rowC{
     display:flex; 
     flex-direction:row;
+    justify-content: center;
 }
 .rightCol {
     border:1px red solid;

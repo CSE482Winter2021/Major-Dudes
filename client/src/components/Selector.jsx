@@ -5,17 +5,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-// import { Parser } from 'html-to-react';
-
-const useStyles = makeStyles((theme) => ({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
-    },
-    selectEmpty: {
-        marginTop: theme.spacing(2),
-    },
-}));
 
 class SimpleSelect extends Component {
     constructor(props) {
@@ -30,20 +19,19 @@ class SimpleSelect extends Component {
             this.props.action(this.props.index, event.target.value);
         };
     
-        const items = []
+        const items = [];
     
         for (let k in this.props.elements) {
-            items.push(<MenuItem value={k}>{this.props.elements[k]}</MenuItem>)
+            items.push(<MenuItem value={k}>{this.props.elements[k]}</MenuItem>);
         }
     
         return (
             <div>
-                <FormControl>
+                <FormControl style={{margin:'5%'}}>
                     <InputLabel id="demo-simple-select-helper-label">{this.props.label}</InputLabel>
                     <Select
                         labelId="demo-simple-select-helper-label"
                         id="demo-simple-select-helper"
-                        // value={age}
                         onChange={handleChange}
                     >
                         <MenuItem value="">
