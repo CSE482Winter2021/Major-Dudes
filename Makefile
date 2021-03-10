@@ -1,4 +1,4 @@
-.PHONY: bootstrap clean lint
+.PHONY: bootstrap clean lint server
 .DEFAULT_GOAL := lint
 
 lint:
@@ -12,6 +12,9 @@ bootstrap:
 	@python3.9 -m pip install -r requirements-test.txt
 	@python3.9 -m pip install -e .
 	@find . -type d -name '*.egg-info' -prune -exec rm -rf {} \;
+
+server:
+	@python3.9 server/api.py
 
 # Pipelines
 
