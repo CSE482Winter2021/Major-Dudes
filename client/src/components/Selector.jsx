@@ -39,7 +39,7 @@ class SimpleSelect extends Component {
                         </MenuItem>
                         {items}
                     </Select>
-                    <FormHelperText>Select the {this.props.label} to calculate the ORCA rate for</FormHelperText>
+                    <FormHelperText>{this.props.helptext}</FormHelperText>
                 </FormControl>
             </div>
         );

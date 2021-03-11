@@ -6,6 +6,11 @@ body {
     position: relative;
     margin: 20px;
 }
+.link{
+    position: relative;
+    margin: 0px;
+    padding-bottom: 25px
+}
 .leaflet-container {
     margin: auto;
     background:white;
@@ -17,11 +22,11 @@ body {
     padding:10px;
     margin:auto;
     color:black;
-    width: 20%;
+    width: 40%;
     height: auto; 
     position: absolute;
     top: 5%;
-    left: 75%;
+    left: 55%;
     z-index: 2;
     border-radius: 25px;
     opacity: .9;
