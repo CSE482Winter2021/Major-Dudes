@@ -151,7 +151,10 @@ class TractCensusReader:
             return []
 
     def get_all_tracts(self):
-        print('hi')
+        all_tracts = set()
+        for tract in self.demographics_info:
+            all_tracts.add(tract)
+        return all_tracts
 
 
 class BlockCensusReader:
@@ -218,90 +221,3 @@ class BlockCensusReader:
             for block in self.demographics_info[tract]:
                 all_blocks.add('53033' + tract + block)
         return all_blocks
-
-    # def get_tract_age_pop(self, block):
-    #     """
-    #     ARGS:
-    #     tract or subtract number
-
-    #     Returns an array of populations per age group of the given tract,
-    #     or the tract containing the given subtract. If not found, returns empty
-    #     list.
-    #     The list is in the following form:
-    #     [< 5, 5-9, 10-14, 15-17, 18-19, 20, 21, 22-24, 25-29, 30-34, 35-39,
-    #     40-44, 45-49, 50-54, 55-59, 60-61, 62-64, 65-66, 67-69, 70-74, 75-79,
-    #     80-84, 85+]
-    #     """
-    #     if block in self.demographics_info:
-    #         return self.demographics_info[block]['age']
-    #     else: 
-    #         return []
-
-    # def get_tract_gender_pop(self, tract):
-    #     """
-    #     ARGS:
-    #     tract or subtract number
-
-    #     Returns a list of populations per gender of the given tract,
-    #     or the tract containing the given subtract. If not found, returns empty
-    #     list.
-    #     The list is in the following form:
-    #     [Population Male, Population Female]
-    #     """
-    #     if tract in self.demographics_info:
-    #         return self.demographics_info[tract]['gender']
-    #     else: 
-    #         return []
-
-    # def get_tract_race_pop(self, tract):
-    #     """
-    #     ARGS:
-    #     tract or subtract number
-
-    #     Returns a list of populations per race of the given tract,
-    #     or the tract containing the given subtract. If not found, returns empty
-    #     list.
-    #     The list is in the following form:
-    #     [ White Only, Black Only, Native Only, Asian Only,
-    #     Hawaiian/Pacific Islander Only, Other Only, Multiracial White,
-    #     Multiracial Black, Multiracial Native, Multiracial Asian,
-    #     Multiracial Hawaiian/Pacific Islander, Multiracial Other ]
-    #     """
-    #     if tract in self.demographics_info:
-    #         return self.demographics_info[tract]['race']
-    #     else: 
-    #         return []
-
-    # def get_tract_disabled_pop(self, tract):
-    #     """
-    #     ARGS:
-    #     tract or subtract number
-
-    #     Returns a list of populations with one disability and 2+ disabilities of
-    #     the given tract, or the tract containing the given subtract. If not
-    #     found, returns empty list. The list is in the following form:
-    #     [1 disability, 2+ disabilities]
-    #     """
-    #     if tract in self.demographics_info:
-    #         return self.demographics_info[tract]['disability']
-    #     else: 
-    #         return []
-
-    # def get_tract_income_pop(self, tract):
-    #     """
-    #     ARGS:
-    #     tract or subtract number
-
-    #     Returns a list of populations in different income ranges of the given
-    #     tract, or the tract containing the given subtract. If not found, return
-    #     empty list.
-    #     The list is in the following form:
-    #     [<10k, 10000-19999, 20000-34999, 35000-49999, 50000-74999, 75000+]
-    #     """
-    #     if tract in self.demographics_info:
-    #         return self.demographics_info[tract]['income']
-    #     else: 
-    #         return []
-
-    # def get_all_tracts(self):
-    #     print('hi')
