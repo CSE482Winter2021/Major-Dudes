@@ -165,16 +165,7 @@ def run_pipeline():
     stops_df = attach_r_initial(stops_df, apc_df)
     stops_df = attach_r_final(stops_df, routes_df, apc_df)
 
-    print(stops_df)
-    print(routes_df)
-    print(apc_df)
-
-    # # Write to CSV
-    # if not os.path.exists(WRITE_DIR):
-    #     os.mkdir(WRITE_DIR)
-    # fpath = os.path.join(WRITE_DIR, OUTPUT_FILENAME)
-    # df.to_csv(fpath, index=False)
-    # print(f'Wrote {OUTPUT_FILENAME} to {WRITE_DIR}')
+    return stops_df
 
 
 if __name__ == '__main__':
