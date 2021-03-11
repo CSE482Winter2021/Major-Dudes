@@ -1,5 +1,17 @@
 import json
 class CensusFileParser:
+    @staticmethod
+    def tract_population_dict(file):
+        with open(file) as f:
+            pop_data = json.load(f)
+        pop_data = pop_data[1:]
+        pop_dict = {}
+        for i in range(len(pop_data)):
+            tr = pop_data[i]
+            pop_dict[tr[len(tr) - 1]] = [int(tr[0])]
+
+        return pop_dict
+
     # TRACT FUNCTIONS
     # { tract_no : [ Total, Male, Female ] }
     @staticmethod
@@ -26,7 +38,6 @@ class CensusFileParser:
             tr = gender_data[i]
             tr_age_data = []
             for i in range(0, 23):
-                print(tr[i+1], tr[i+25])
                 tr_age_data.append(int(tr[i + 1]) + int(tr[i + 25]))
             tr_age_data.insert(0, sum(tr_age_data))
             age_dict[tr[len(tr) - 1]] = tr_age_data
@@ -85,6 +96,24 @@ class CensusFileParser:
         return disability_dict
 
     # BLOCK FUNCTIONS
+    @staticmethod
+    def block_population_dict(file):
+        with open(file) as f:
+            pop_data = json.load(f)
+        pop_data = pop_data[1:]
+        pop_dict = {}
+        for i in range(len(pop_data)):
+            block_data = pop_data[i]
+            if block_data[0] == '0':
+                continue
+            block_no = block_data[len(block_data) - 1]
+            tract_no = block_data[len(block_data) - 2]
+            if tract_no not in pop_dict:
+                pop_dict[tract_no] = {}
+            pop_dict[tract_no][block_no] = [int(block_data[0])]
+
+        return pop_dict
+
     # { tract_no : { block_no : [ Total, Male, Female ] } }
     @staticmethod
     def block_gender_dict(file):
@@ -179,7 +208,7 @@ class CensusFileParser:
             income_dict[tract_no][block_no] = block_income_data
         return income_dict
 
-cp = CensusFileParser()
-raw_dir = '/Users/kristoferwong/Major-Dudes/data/census_data/raw_data'
-b_dir = '/Users/kristoferwong/Major-Dudes/data/census_data/raw_block_data'
-print(cp.block_income_dict(b_dir + '/income_bg_data.json'))
+# cp = CensusFileParser()
+# raw_dir = '/Users/kristoferwong/Major-Dudes/data/census_data/raw_data'
+# b_dir = '/Users/kristoferwong/Major-Dudes/data/census_data/raw_block_data'
+# print(cp.block_income_dict(b_dir + '/income_bg_data.json'))
