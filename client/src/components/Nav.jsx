@@ -11,9 +11,6 @@ const Nav = () => {
       <Link className="menu-item" to="/" style={{textDecoration: 'none'}}>
         Home
       </Link>
-      <Link className="menu-item" to="/Map" style={{textDecoration: 'none'}}>
-        Map
-      </Link>
       <Link className="menu-item" to="/Estimator" style={{textDecoration: 'none'}}>
         Estimator
       </Link>
