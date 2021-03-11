@@ -86,47 +86,137 @@ class MapPage extends Component {
     const genderElements = {1:'Male', 2:'Female'};
     const raceElements = {1:'White', 2:'Black', 3:'Native', 4:'Pacific Islander', 5:'Asian', 6:'Other'};
     const incomeElements = {1:'$0 to $9,999', 2:'$10,000 to $14,999', 3:'$15,000 to $19,999', 4:'$20,000 to $24,999', 5:'$25,000 to $29,999', 6:'$30,000 to $34,999', 7:'$35,000 to $39,999', 8:'$40,000 to $44,999', 9:'$45,000 to $49,999', 10:'$50,000 to $59,999', 11:'$60,000 to $74,999', 12:'$75,000 to $99,999', 13:'$100,000 to $124,999', 14:'$125,000 to $149,999', 15:'$150,000 to $199,999', 16:'More than $200,000'};
-    const disabilityElements = {1:'Disabled', 2:'Not Disabled'}
+    const disabilityElements = { 1: 'Disabled', 2: 'Not Disabled' }
+    console.log(this.props.selectors[0]);
+    const hasData = this.props.selectors[0];
     return (
-      <div className='container'>
-        <table className='demo_table'>
+      <div className="container">
+        <table className="demo_table">
           <tr>
             <th></th>
             <th>King County</th>
-            <th>Tract {tract_demos[tract_num]['name']}</th>
+            <th>Tract {tract_demos[tract_num]["name"]}</th>
           </tr>
-          <tr>
-            <td>Age: {ageElements[this.props.selectors[0]]}</td>
-            <td>{Math.round(10000 * tract_demos['total']['age'][this.props.selectors[0]]/tract_demos['total']['age'][0]) / 100}%</td>
-            <td>{Math.round(10000 *tract_demos[tract_num]['age'][this.props.selectors[0]]/tract_demos[tract_num]['age'][0]) / 100}%</td>
-          </tr>
-          <tr>
-            <td>Gender: {genderElements[this.props.selectors[1]]}</td>
-            <td>{Math.round(10000 * tract_demos['total']['gender'][this.props.selectors[1]]/tract_demos['total']['gender'][0]) / 100}%</td>
-            <td>{Math.round(10000 *tract_demos[tract_num]['gender'][this.props.selectors[1]]/tract_demos[tract_num]['gender'][0]) / 100}%</td>
-          </tr>
-          <tr>
-            <td>Race: {raceElements[this.props.selectors[2]]}</td>
-            <td>{Math.round(10000 * tract_demos['total']['race'][this.props.selectors[2]]/tract_demos['total']['race'][0]) / 100}%</td>
-            <td>{Math.round(10000 *tract_demos[tract_num]['race'][this.props.selectors[2]]/tract_demos[tract_num]['race'][0]) / 100}%</td>
-          </tr>
-          <tr>
-            <td>Income: {incomeElements[this.props.selectors[3]]}</td>
-            <td>{Math.round(10000 * tract_demos['total']['income'][this.props.selectors[3]]/tract_demos['total']['income'][0]) / 100}%</td>
-            <td>{Math.round(10000 *tract_demos[tract_num]['income'][this.props.selectors[3]]/tract_demos[tract_num]['income'][0]) / 100}%</td>
-          </tr>
-          <tr>
-            <td>Disabled: {disabilityElements[this.props.selectors[4]]}</td>
-            <td>{Math.round(10000 * tract_demos['total']['disability'][this.props.selectors[4]]/tract_demos['total']['disability'][0]) / 100}%</td>
-            <td>{Math.round(10000 *tract_demos[tract_num]['disability'][this.props.selectors[4]]/tract_demos[tract_num]['disability'][0]) / 100}%</td>
-          </tr>
+          {hasData ? (
+            <>
+              <tr>
+                <td>Age: {ageElements[this.props.selectors[0]]}</td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos["total"]["age"][this.props.selectors[0]]) /
+                      tract_demos["total"]["age"][0]
+                  ) / 100}
+                  %
+                </td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos[tract_num]["age"][this.props.selectors[0]]) /
+                      tract_demos[tract_num]["age"][0]
+                  ) / 100}
+                  %
+                </td>
+              </tr>
+              <tr>
+                <td>Gender: {genderElements[this.props.selectors[1]]}</td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos["total"]["gender"][this.props.selectors[1]]) /
+                      tract_demos["total"]["gender"][0]
+                  ) / 100}
+                  %
+                </td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos[tract_num]["gender"][
+                        this.props.selectors[1]
+                      ]) /
+                      tract_demos[tract_num]["gender"][0]
+                  ) / 100}
+                  %
+                </td>
+              </tr>
+              <tr>
+                <td>Race: {raceElements[this.props.selectors[2]]}</td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos["total"]["race"][this.props.selectors[2]]) /
+                      tract_demos["total"]["race"][0]
+                  ) / 100}
+                  %
+                </td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos[tract_num]["race"][this.props.selectors[2]]) /
+                      tract_demos[tract_num]["race"][0]
+                  ) / 100}
+                  %
+                </td>
+              </tr>
+              <tr>
+                <td>Income: {incomeElements[this.props.selectors[3]]}</td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos["total"]["income"][this.props.selectors[3]]) /
+                      tract_demos["total"]["income"][0]
+                  ) / 100}
+                  %
+                </td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos[tract_num]["income"][
+                        this.props.selectors[3]
+                      ]) /
+                      tract_demos[tract_num]["income"][0]
+                  ) / 100}
+                  %
+                </td>
+              </tr>
+              <tr>
+                <td>Disabled: {disabilityElements[this.props.selectors[4]]}</td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos["total"]["disability"][
+                        this.props.selectors[4]
+                      ]) /
+                      tract_demos["total"]["disability"][0]
+                  ) / 100}
+                  %
+                </td>
+                <td>
+                  {Math.round(
+                    (10000 *
+                      tract_demos[tract_num]["disability"][
+                        this.props.selectors[4]
+                      ]) /
+                      tract_demos[tract_num]["disability"][0]
+                  ) / 100}
+                  %
+                </td>
+              </tr>
+            </>
+          ) : (
+            ""
+          )}
           <tr>
             <td>Overall</td>
-            <td>{this.state.tract_perc == -1 ? 'No data for this tract' : `${this.state.tract_perc * 100}%`}</td>
+            <td>
+              {this.state.tract_perc == -1
+                ? "No data for this tract"
+                : `${(100 * this.state.tract_perc).toFixed(2)}%`}
+            </td>
           </tr>
         </table>
       </div>
-      );
+    );
   }
 
   unClicked() {
