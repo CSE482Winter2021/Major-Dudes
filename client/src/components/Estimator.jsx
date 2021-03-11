@@ -48,7 +48,7 @@ class Estimator extends Component {
         return (
             <div className="App">
                 <h1 className="App-header" style={{ textAlign: "center" }}>ORCA Card Estimator</h1>
-                <div>Find out how likely a person with some set of demographics is to have an ORCA Card in King County</div>
+                <div>Select an option for each of the following demographics to find out how likely such a person is to own an ORCA Card in King County</div>
                 <div className="rowC">
                     <SimpleSelect index={0} label={'Age'} elements={ageElements} action={this.childHandler} helptext={'Select an age range to calculate the ORCA rate for'}/>
                     <SimpleSelect index={1} label={'Gender'} elements={genderElements} action={this.childHandler} helptext={'Select a gender to calculate the ORCA rate for'}/>

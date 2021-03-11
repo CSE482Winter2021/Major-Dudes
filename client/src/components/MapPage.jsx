@@ -159,7 +159,8 @@ class MapPage extends Component {
           </Map>
         </div>
         <div className='overlay'>
-          <div className='link'><a href="https://geocoding.geo.census.gov/geocoder/geographies/address?form">Find any address's corresponding tract here</a></div>
+          <SimpleSelect index={0} label={'Tract Number'} elements={tractSelector} action={(a, b)=>{this.handleTractClick(b)}} helptext={'Select a tract number to view details about your chosen demographics in that tract.'}/>
+          <div className='link'><a href="https://geocoding.geo.census.gov/geocoder/geographies/address?form" target="_blank" rel="noopener noreferrer">Find any address's corresponding tract here</a></div>
         </div>
         { clicked ? <div className='overlay'>
           <h3>
