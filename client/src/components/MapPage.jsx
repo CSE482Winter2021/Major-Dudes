@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from 'axios';
 import L from 'leaflet';
 import R from 'leaflet-responsive-popup';
 import { MapContainer as Map, GeoJSON } from "react-leaflet";
@@ -29,7 +30,8 @@ const tractBorderStyle = {
 
 const defaultState = {
   clicked: false,
-  tract_num: ''
+  tract_num: '',
+  tract_rate: -1,
 };
 
 class MapPage extends Component {
@@ -42,10 +44,10 @@ class MapPage extends Component {
     this.unClicked = this.unClicked.bind(this);
   }
 
-  onEachTract (tract, layer) {  
+  onEachTract (tract, layer) {
     const popup = R.responsivePopup().setContent('Tract Number ' + tract.id);
     layer.bindPopup(popup);
-  
+
     layer.on('mouseover mousemove', function (e) {
       this.openPopup(e.latlng);
     });
@@ -58,14 +60,23 @@ class MapPage extends Component {
     });
   }
 
-  handleTractClick(tr_num) {
+  async handleTractClick(tr_num) {
     if (this.state.tract_num === tr_num)
       return;
     this.setState({
       clicked: true,
       tract_num: tr_num,
     });
-    console.log(this.state);
+    try {
+      const supertr = parseInt((parseInt(tr_num) - (parseInt(tr_num) % 100)) / 100);
+      const url = `http://localhost:5000/orca_rates/${supertr}`;
+      const response = await axios(url);
+      this.setState({ tract_perc: response.data })
+      console.log(this.state);
+    } catch (err) {
+      console.log(err);
+      this.setState({tract_perc: 'error'})
+    }
   }
 
   getDemographics() {
@@ -105,20 +116,19 @@ class MapPage extends Component {
             <td>{Math.round(10000 *tract_demos[tract_num]['income'][this.props.selectors[3]]/tract_demos[tract_num]['income'][0]) / 100}%</td>
           </tr>
           <tr>
-            <td>{disabilityElements[this.props.selectors[4]]}</td>
+            <td>Disabled: {disabilityElements[this.props.selectors[4]]}</td>
             <td>{Math.round(10000 * tract_demos['total']['disability'][this.props.selectors[4]]/tract_demos['total']['disability'][0]) / 100}%</td>
             <td>{Math.round(10000 *tract_demos[tract_num]['disability'][this.props.selectors[4]]/tract_demos[tract_num]['disability'][0]) / 100}%</td>
           </tr>
           <tr>
-            <td>All Selections</td>
-            <td>{Math.round(1000000 * (tract_demos['total']['disability'][this.props.selectors[4]]/tract_demos['total']['disability'][0]) * (tract_demos['total']['income'][this.props.selectors[3]]/tract_demos['total']['income'][0]) * (tract_demos['total']['race'][this.props.selectors[2]]/tract_demos['total']['race'][0]) * (tract_demos['total']['gender'][this.props.selectors[1]]/tract_demos['total']['gender'][0]) * (tract_demos['total']['age'][this.props.selectors[0]]/tract_demos['total']['age'][0])) / 10000}%</td>
-            <td>{Math.round(1000000 * (tract_demos[tract_num]['disability'][this.props.selectors[4]]/tract_demos[tract_num]['disability'][0]) * (tract_demos[tract_num]['income'][this.props.selectors[3]]/tract_demos[tract_num]['income'][0]) * (tract_demos[tract_num]['race'][this.props.selectors[2]]/tract_demos[tract_num]['race'][0]) * (tract_demos[tract_num]['gender'][this.props.selectors[1]]/tract_demos[tract_num]['gender'][0]) * (tract_demos[tract_num]['age'][this.props.selectors[0]]/tract_demos[tract_num]['age'][0])) / 10000}%</td>
+            <td>Overall</td>
+            <td>{this.state.tract_perc == -1 ? 'No data for this tract' : `${this.state.tract_perc * 100}%`}</td>
           </tr>
         </table>
       </div>
       );
   }
-  
+
   unClicked() {
     this.setState({
       clicked: false,
@@ -149,7 +159,6 @@ class MapPage extends Component {
           </Map>
         </div>
         <div className='overlay'>
-          <SimpleSelect index={0} label={'Tract Number'} elements={tractSelector} action={(a, b)=>{this.handleTractClick(b)}} helptext={'Select a tract number to view details about your chosen demographics in that tract.'}/>
           <div className='link'><a href="https://geocoding.geo.census.gov/geocoder/geographies/address?form">Find any address's corresponding tract here</a></div>
         </div>
         { clicked ? <div className='overlay'>

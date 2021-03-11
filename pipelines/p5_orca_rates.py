@@ -166,7 +166,8 @@ def aggregate_by_tracts(stops_df):
     aggregate = []
     for tr in tr_rates:
         # print(tr)
-        l = [tr, statistics.mean(tr_rates[tr])]
+        supertr = int((int(tr) - (int(tr) % 100)) / 100)
+        l = [str(supertr), statistics.mean(tr_rates[tr])]
         aggregate.append(l)
     aggregate = np.array(aggregate)
     CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
@@ -184,7 +185,7 @@ def run_pipeline():
     stops_df, routes_df, apc_df = load_input()
     stops_df = attach_r_initial(stops_df, apc_df)
     stops_df = attach_r_final(stops_df, routes_df, apc_df)
-    aggregate_by_tracts(stops_df)
+    stops_df = aggregate_by_tracts(stops_df)
 
     return stops_df
 

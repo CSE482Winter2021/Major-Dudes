@@ -27,6 +27,6 @@ def orca_rates_stop_id(stop_id):
         data = obj['data']
 
         if stop_id not in data:
-            return -1
+            return tojson(-1)
 
         return tojson(data[stop_id])

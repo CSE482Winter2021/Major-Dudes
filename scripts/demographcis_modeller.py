@@ -1,8 +1,12 @@
 from sklearn.kernel_approximation import RBFSampler
-import random, os, json, csv
+import random, os, json, csv, math
 import numpy as np
 from utils import constants
 CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
+
+
+def sigmoid(x):
+  return 1 / (1 + math.exp(-x))
 
 
 class ORCA_Rate_Model:
@@ -17,7 +21,7 @@ class ORCA_Rate_Model:
         for i in phi_i:
             phi += i
         return np.array(phi[0] / self.dimensions)
-     
+
     def train(self, X, y):
         """
         X: list of Locations which are lists of samples, vectors of demographics
@@ -32,15 +36,15 @@ class ORCA_Rate_Model:
         # print(inv.shape)
         # print(y.shape)
         self.W = np.matmul(inv, y)
-    
+
     def predict(self, X):
         """
         X must be [[ demographics ]]
         """
-        # if self.W != None:
-        return np.matmul(self.kernel.fit_transform([X]), self.W)
-        # else:
-        #     return None
+        y = np.matmul(self.kernel.fit_transform([X]), self.W)
+        y = sigmoid(y)
+        y *= 100
+        return y
 
 
 # for each tract, set phi[tract] = rbf.fit_transform(tensor[tract])
@@ -74,7 +78,7 @@ def get_training_data():
             continue
         tract = tr_demo[tract_no]
         p_gender = [
-            round(tract['gender'][1] / tract['gender'][0], 5), 
+            round(tract['gender'][1] / tract['gender'][0], 5),
             round(tract['gender'][2] / tract['gender'][0], 5)
         ]
         # print(sum(p_gender))
@@ -149,7 +153,7 @@ def get_training_data():
             v = -p_income[15]
             p_income[15] = 0
             p_income[idx] -= v
-            
+
         # print(sum(p_income))
         p_disability = [
             tract['disability'][1] / tract['disability'][0],
@@ -175,15 +179,16 @@ def get_training_data():
     return training_data, y
 
 # (X, y) = get_training_data()
-with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'r') as f:
-    j = json.load(f)
-X = j[0]
-y = j[1]
-m = ORCA_Rate_Model(200)
-m.train(X, y)
-print(m.predict([1,12,3,9,0]))
-print(m.predict([1,9,2,1,0]))
-print(m.predict([1,17,3,5,0]))
-print(m.predict([1,4,8,9,0]))
-print(m.predict([1,1,2,7,0]))
-print(m.predict([0,7,3,13,0]))
+if __name__ == '__main__':
+    with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'r') as f:
+        j = json.load(f)
+        X = j[0]
+        y = j[1]
+        m = ORCA_Rate_Model(200)
+        m.train(X, y)
+        print(m.predict([1,12,3,9,0]))
+        print(m.predict([1,9,2,1,0]))
+        print(m.predict([1,17,3,5,0]))
+        print(m.predict([1,4,8,9,0]))
+        print(m.predict([1,1,2,7,0]))
+        print(m.predict([0,7,3,13,0]))
