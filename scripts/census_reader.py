@@ -13,7 +13,7 @@ CENSUS_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_outp
 class TractCensusReader:
     def __init__(self):
         # GIS Data
-        with open(f'{CENSUS_DATA_DIR}/tracts_demographics.geojson', 'r') as f:
+        with open(f'{CENSUS_DATA_DIR}/tracts_demographics_v2.geojson', 'r') as f:
             geo_js = json.load(f)
 
         # Holds the geoJson feature and polygon for each tract
@@ -25,7 +25,7 @@ class TractCensusReader:
         # Maps seen points to their tract num
         self.seen_points = {}
 
-        with open(f'{CENSUS_DATA_DIR}/tract_to_demographics.json', 'r') as f:
+        with open(f'{CENSUS_DATA_DIR}/tract_to_demographics_v2.json', 'r') as f:
             self.demographics_info = json.load(f)
         
     def xy_to_tract_num(self, longitude, latitude):

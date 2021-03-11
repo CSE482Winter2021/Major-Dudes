@@ -11,6 +11,8 @@ from shapely.geometry import shape, Point
 
 from scripts.census_structures import CensusFileParser
 
+NAME = 'p0_census_tracts'
+
 def merge_tracts_supertracts(pop_data, geo_js):
     possible_tracts = {}
     for tract in geo_js['features']:
@@ -74,8 +76,7 @@ def create_merged_geojs(geo_js, final_tracts):
 
 def merge_census_data(data, final_tracts):
     new_data = {}
-    for tract_data in pop_data:
-        tract = tract_data[3]
+    for tract in data:
         if tract in final_tracts:
             new_data[tract] = data[tract]
         else:
@@ -115,7 +116,6 @@ def run_pipeline():
     race_dict = CensusFileParser.tract_race_dict(f'{CENSUS_RT_DATA_DIR}/race_data.json')
     income_dict = CensusFileParser.tract_income_dict(f'{CENSUS_RT_DATA_DIR}/income_data.json')
     disability_dict = CensusFileParser.tract_disability_dict(f'{CENSUS_RT_DATA_DIR}/disabilities_data.json')
-
     merged_pop_dict = merge_census_data(pop_dict, final_tracts)
     merged_age_dict = merge_census_data(age_dict, final_tracts)
     merged_gender_dict = merge_census_data(gender_dict, final_tracts)

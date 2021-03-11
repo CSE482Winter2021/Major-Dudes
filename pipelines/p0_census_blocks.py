@@ -11,13 +11,14 @@ from shapely.geometry import shape, Point
 
 from scripts.census_structures import CensusFileParser
 
+NAME = 'p0_census_blocks'
+
 def run_pipeline():
     # Run pipeline
     CENSUS_RT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'raw_data')
     CENSUS_RB_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'raw_block_data')
 
     CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
-    
 
     with open(f'{CENSUS_RB_DATA_DIR}/blocks_2010.json', 'r') as f:
         geo_js = json.load(f)

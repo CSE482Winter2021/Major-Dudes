@@ -56,6 +56,7 @@ class CensusFileParser:
             tr_race_data = []
             for i in range(8):
                 tr_race_data.append(int(tr[i]))
+            tr_race_data[0] = sum(tr_race_data[1:])
             race_dict[tr[len(tr) - 1]] = tr_race_data
         return race_dict
 

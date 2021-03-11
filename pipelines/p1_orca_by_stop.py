@@ -5,7 +5,7 @@ import numpy as np
 import sklearn.neighbors as knn
 from tqdm import tqdm
 
-from scripts.census_reader import CensusReader
+from scripts.census_reader import TractCensusReader
 from utils import constants
 
 NAME = 'p1_orca_by_stop'
@@ -81,7 +81,7 @@ def add_census_data(stop_df):
 
     result = []
 
-    reader = CensusReader()
+    reader = TractCensusReader()
     bad_tracts = 0
     bad_pops = 0
     for row in tqdm(stop_df.to_numpy(), desc="Loading census data"):

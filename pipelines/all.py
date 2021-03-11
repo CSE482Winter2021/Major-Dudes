@@ -1,6 +1,6 @@
 from tqdm import tqdm
 
-import pipelines.p0_census_block as p0_b
+import pipelines.p0_census_blocks as p0_b
 import pipelines.p0_census_tracts as p0_t
 import pipelines.p1_orca_by_stop as p1
 import pipelines.p2_aggregate_orca as p2
