@@ -16,7 +16,7 @@ class Estimator extends Component {
         data[index] = dataFromChild;
         this.setState({ data });
     }
-    calculate() {
+    calculate() { // TODO: PIERCE PLS DO API CALL FOR MODEL HERE
         let i = 0;
         for (let k in this.state.data) {
             i += parseInt(this.state.data[k]);

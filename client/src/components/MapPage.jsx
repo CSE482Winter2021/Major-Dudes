@@ -52,7 +52,6 @@ class MapPage extends Component {
 
     layer.on('click', (e) => {
       this.handleTractClick(tract.id)
-      layer.center(e.latlng)
     });
     layer.on('mouseout', function (e) {
       this.closePopup();
@@ -60,8 +59,8 @@ class MapPage extends Component {
   }
 
   handleTractClick(tr_num) {
-    // if (this.state.tract_num === tr_num)
-    //   return;
+    if (this.state.tract_num === tr_num)
+      return;
     this.setState({
       clicked: true,
       tract_num: tr_num,
