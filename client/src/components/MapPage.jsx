@@ -208,6 +208,7 @@ class MapPage extends Component {
           )}
           <tr>
             <td>Overall</td>
+            <td></td>
             <td>
               {this.state.tract_perc == -1
                 ? "No data for this tract"
