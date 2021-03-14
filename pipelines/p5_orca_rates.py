@@ -155,19 +155,15 @@ def aggregate_by_tracts(stops_df):
     Aggregates r_final by tract.
     """
     tr_rates = {}
-    print(stops_df)
 
     for stop in stops_df.to_numpy():
         tract = str(int(stop[1]))
-        # print(stop)
         if tract not in tr_rates:
             tr_rates[tract] = []
         tr_rates[tract].append(stop[4])
     aggregate = []
     for tr in tr_rates:
-        # print(tr)
-        supertr = int((int(tr) - (int(tr) % 100)) / 100)
-        l = [str(supertr), statistics.mean(tr_rates[tr])]
+        l = [tr, statistics.mean(tr_rates[tr])]
         aggregate.append(l)
     aggregate = np.array(aggregate)
     CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')

@@ -1,26 +1,48 @@
 from sklearn.kernel_approximation import RBFSampler
-import random, os, json, csv, math
+import random, os, json, csv, math, sys
 import numpy as np
 from utils import constants
+from sklearn import linear_model
 CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
 
+# TODO: 
+#   Can't use a Logistic Regression with continuous output (y).
+#       Option: calculate W manually: W = pinv(phi_arr) * inverse_sigmoid(y),
+#           But Motoya says that it’s not squared loss so it would not be robust.
+#           Need a solution for this? More consultation with Motoya likely needed here
+#   Split the sampling data into training and testing data (multiple times) to get % error
+#       Current state of X given by CreateSamplesInputs.get_training_data is [ 295 x [ sample_size x 5 ] ]
+#           that is 295 locations (tracts), so split into 245 training, 50 data (have to change d in model to be < num_locations, Motoya suggested 240)
+#
+# Assumptions to add to writeup: 
+#   Hyperparameter in our transform less than number of data points we have is okay here
+#   ORCA rate / demographics can be represented by the approximation where d < (295, # of locations). 
+#       As data increases, this assumption is less restrictive.
+#   Assumes independence in demographics. Need to report that this is something to improve on to make the model less biased.
+#       Would need more data within one location - should inform in assignment 6 what kind of data we will need to get rid of this bias.
+#       Sample number 15000 might be small, but we should report that this could be edited / tuned to make the model better (put this in report)
 
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
 
 class ORCA_Rate_Model:
-    def __init__(self, d):
-        self.W = None
+    def __init__(self, d):  # Make d 290 since we have 295 tracts
+        # self.W = None
+        self.fitted_model = None
         self.dimensions = d
-        self.kernel = RBFSampler(gamma=1, n_components=d, random_state=1)
+        self.clf = linear_model.LogisticRegression(C=1e40, solver='newton-cg')
+        self.kernel = RBFSampler(gamma=1, n_components=d, random_state=1) # might want to tune this to make better
 
     def PHI(self, L):
+        # L dimensions [5 x 5000]
+        # transform L to [d x 5000]
         phi_i = np.array(self.kernel.fit_transform(L))
         phi = np.zeros((1, self.dimensions))
+        # sum up all 5000 vectors to make [d x 1] & divide by 5000 -> d x 1
         for i in phi_i:
             phi += i
-        return np.array(phi[0] / self.dimensions)
+        return np.array(phi[0] / self.dimensions) 
 
     def train(self, X, y):
         """
@@ -28,167 +50,181 @@ class ORCA_Rate_Model:
         y: ORCA rate for each location
         """
         phi_arr = []
-        for L in X:
-            phi_arr.append(self.PHI(L))
-        phi_arr = np.array(phi_arr)
-        inv = np.linalg.pinv(phi_arr)
+        for L in X: # X = [295 x [5 x 5000]]
+            transform = self.PHI(L)
+            phi_arr.append(transform) # stack all 295 locations' [d x 1] vectors
+        # phi_arr: [d x 295] matrix
+        X_T = np.array(phi_arr)
         y = np.asarray(y, dtype='float64')
-        # print(inv.shape)
-        # print(y.shape)
-        self.W = np.matmul(inv, y)
+        print(X_T.shape)
+        self.clf.fit(X_T, y) 
+        # Deprecated: Using linear regrassion by inverting output from PHI and matmul by y
+        # phi_arr = np.array(phi_arr)
+        # inv = np.linalg.pinv(phi_arr)
+        # y = np.asarray(y, dtype='float64')
+        # self.W = np.matmul(inv, y) # y = [1 x 295]
 
     def predict(self, X):
         """
         X must be [[ demographics ]]
         """
-        y = np.matmul(self.kernel.fit_transform([X]), self.W)
-        y = sigmoid(y)
+        # y = np.matmul(self.kernel.fit_transform([X]), self.W)
+        # y = sigmoid(y)
+        y = self.clf.predict((X))
         y *= 100
         return y
 
+        # y = sigmoid(W * PHI)
+        # find some logistic regression package to solve / train for W
 
-# for each tract, set phi[tract] = rbf.fit_transform(tensor[tract])
-# L_0 = [[1,5,2,0,12], [2,4,1,20,1]]
-# L_1 = [[1,3,2,5,4], [7,3,2,10,6]]
-# # L_2 = [[1,3,2,5,4], [7,3,2,10,6]]
-# # L_3 = [[1,3,2,5,4], [7,3,2,10,6]]
-# y = np.array([.23, .49])
 
-# phi_arr = []
-# phi_arr.append(PHI(L_0, 200))
-# phi_arr.append(PHI(L_1, 200))
-# phi_arr = np.array(phi_arr)
+class CreateSamplesInputs:
+    def __init__(self):  # Make d 290 since we have 295 tracts
+        self.gender_size = 2
+        self.age_size = 23
+        self.race_size = 6
+        self.income_size = 16
+        self.disability_size = 2
+        self.sample_size = 15000
 
-# inv = np.linalg.pinv(phi_arr)
-# W = np.matmul(inv, y)
+    def get_training_data(self):
+        with open(f'{CENSUS_OUTPUT_DATA_DIR}/tract_to_demographics_v2.json', 'r') as f:
+            tr_demo = json.load(f)
+        with open(f'{CENSUS_OUTPUT_DATA_DIR}/tract_rates.csv', 'r') as f:
+            tract_rates = list(csv.reader(f))
+        tract_rates = {tract_rates[idx][0] : tract_rates[idx][1] for idx in range(len(tract_rates))}
+        training_data = []
+        y = []
+        for tract_no in tr_demo:
+            if str(int(tract_no)) not in tract_rates:
+                continue
+            tract = tr_demo[tract_no]
+            p_gender = [
+                round(tract['gender'][1] / tract['gender'][0], 5),
+                round(tract['gender'][2] / tract['gender'][0], 5)
+            ]
 
-# kernel = RBFSampler(gamma=1, n_components=200, random_state=1)
-# print(np.matmul(kernel.fit_transform([[1,5,2,0,12]]), W))
+            p_age = [
+                round(tract['age'][1] / tract['age'][0], 5),
+                round(tract['age'][2] / tract['age'][0], 5),
+                round(tract['age'][3] / tract['age'][0], 5),
+                round(tract['age'][4] / tract['age'][0], 5),
+                round(tract['age'][5] / tract['age'][0], 5),
+                round(tract['age'][6] / tract['age'][0], 5),
+                round(tract['age'][7] / tract['age'][0], 5),
+                round(tract['age'][8] / tract['age'][0], 5),
+                round(tract['age'][9] / tract['age'][0], 5),
+                round(tract['age'][10] / tract['age'][0], 5),
+                round(tract['age'][11] / tract['age'][0], 5),
+                round(tract['age'][12] / tract['age'][0], 5),
+                round(tract['age'][13] / tract['age'][0], 5),
+                round(tract['age'][14] / tract['age'][0], 5),
+                round(tract['age'][15] / tract['age'][0], 5),
+                round(tract['age'][16] / tract['age'][0], 5),
+                round(tract['age'][17] / tract['age'][0], 5),
+                round(tract['age'][18] / tract['age'][0], 5),
+                round(tract['age'][19] / tract['age'][0], 5),
+                round(tract['age'][20] / tract['age'][0], 5),
+                round(tract['age'][21] / tract['age'][0], 5),
+                round(tract['age'][22] / tract['age'][0], 5)
+            ]
+            p_age.append(1 - sum(p_age))
+            if p_age[22] < 0:
+                idx = p_age.index(max(p_age))
+                v = -p_age[22]
+                p_age[22] = 0
+                p_age[idx] -= v
 
-def get_training_data():
-    with open(f'{CENSUS_OUTPUT_DATA_DIR}/tract_to_demographics_v2.json', 'r') as f:
-        tr_demo = json.load(f)
-    with open(f'{CENSUS_OUTPUT_DATA_DIR}/tract_rates.csv', 'r') as f:
-        tract_rates = list(csv.reader(f))
-    tract_rates = {tract_rates[idx][0] : tract_rates[idx][1] for idx in range(len(tract_rates))}
-    training_data = [] #np.zeros((num_tracts, sample_size, num_dim))
-    y = []
-    for tract_no in tr_demo:
-        if str(int(tract_no)) not in tract_rates:
-            continue
-        tract = tr_demo[tract_no]
-        p_gender = [
-            round(tract['gender'][1] / tract['gender'][0], 5),
-            round(tract['gender'][2] / tract['gender'][0], 5)
-        ]
-        # print(sum(p_gender))
-        p_age = [
-            round(tract['age'][1] / tract['age'][0], 5),
-            round(tract['age'][2] / tract['age'][0], 5),
-            round(tract['age'][3] / tract['age'][0], 5),
-            round(tract['age'][4] / tract['age'][0], 5),
-            round(tract['age'][5] / tract['age'][0], 5),
-            round(tract['age'][6] / tract['age'][0], 5),
-            round(tract['age'][7] / tract['age'][0], 5),
-            round(tract['age'][8] / tract['age'][0], 5),
-            round(tract['age'][9] / tract['age'][0], 5),
-            round(tract['age'][10] / tract['age'][0], 5),
-            round(tract['age'][11] / tract['age'][0], 5),
-            round(tract['age'][12] / tract['age'][0], 5),
-            round(tract['age'][13] / tract['age'][0], 5),
-            round(tract['age'][14] / tract['age'][0], 5),
-            round(tract['age'][15] / tract['age'][0], 5),
-            round(tract['age'][16] / tract['age'][0], 5),
-            round(tract['age'][17] / tract['age'][0], 5),
-            round(tract['age'][18] / tract['age'][0], 5),
-            round(tract['age'][19] / tract['age'][0], 5),
-            round(tract['age'][20] / tract['age'][0], 5),
-            round(tract['age'][21] / tract['age'][0], 5),
-            round(tract['age'][22] / tract['age'][0], 5)
-        ]
-        p_age.append(1 - sum(p_age))
-        if p_age[22] < 0:
-            idx = p_age.index(max(p_age))
-            v = -p_age[22]
-            p_age[22] = 0
-            p_age[idx] -= v
+            p_race = [
+                round(tract['race'][1] / tract['race'][0], 5),
+                round(tract['race'][2] / tract['race'][0], 5),
+                round(tract['race'][3] / tract['race'][0], 5),
+                round(tract['race'][4] / tract['race'][0], 5),
+                round(tract['race'][5] / tract['race'][0], 5)
+            ]
+            p_race.append(1 - sum(p_race))
+            if p_race[5] < 0:
+                idx = p_race.index(max(p_race))
+                v = -p_race[5]
+                p_race[5] = 0
+                p_race[idx] -= v
 
-        # print(sum(p_age))
-        p_race = [
-            round(tract['race'][1] / tract['race'][0], 5),
-            round(tract['race'][2] / tract['race'][0], 5),
-            round(tract['race'][3] / tract['race'][0], 5),
-            round(tract['race'][4] / tract['race'][0], 5),
-            round(tract['race'][5] / tract['race'][0], 5),
-            round(tract['race'][6] / tract['race'][0], 5),
-        ]
-        p_race.append(1 - sum(p_race))
-        if p_race[6] < 0:
-            idx = p_race.index(max(p_race))
-            v = -p_race[6]
-            p_race[6] = 0
-            p_race[idx] -= v
-        # print(sum(p_race))
-        # print(tract['income'])
-        p_income = [
-            tract['income'][1] / tract['income'][0],
-            tract['income'][2] / tract['income'][0],
-            tract['income'][3] / tract['income'][0],
-            tract['income'][4] / tract['income'][0],
-            tract['income'][5] / tract['income'][0],
-            tract['income'][6] / tract['income'][0],
-            tract['income'][7] / tract['income'][0],
-            tract['income'][8] / tract['income'][0],
-            tract['income'][9] / tract['income'][0],
-            tract['income'][10] / tract['income'][0],
-            tract['income'][11] / tract['income'][0],
-            tract['income'][12] / tract['income'][0],
-            tract['income'][13] / tract['income'][0],
-            tract['income'][14] / tract['income'][0],
-            tract['income'][15] / tract['income'][0]
-        ]
-        p_income.append(1 - sum(p_income))
-        if p_income[15] < 0:
-            idx = p_income.index(max(p_income))
-            v = -p_income[15]
-            p_income[15] = 0
-            p_income[idx] -= v
+            p_income = [
+                tract['income'][1] / tract['income'][0],
+                tract['income'][2] / tract['income'][0],
+                tract['income'][3] / tract['income'][0],
+                tract['income'][4] / tract['income'][0],
+                tract['income'][5] / tract['income'][0],
+                tract['income'][6] / tract['income'][0],
+                tract['income'][7] / tract['income'][0],
+                tract['income'][8] / tract['income'][0],
+                tract['income'][9] / tract['income'][0],
+                tract['income'][10] / tract['income'][0],
+                tract['income'][11] / tract['income'][0],
+                tract['income'][12] / tract['income'][0],
+                tract['income'][13] / tract['income'][0],
+                tract['income'][14] / tract['income'][0],
+                tract['income'][15] / tract['income'][0]
+            ]
+            p_income.append(1 - sum(p_income))
+            if p_income[15] < 0:
+                idx = p_income.index(max(p_income))
+                v = -p_income[15]
+                p_income[15] = 0
+                p_income[idx] -= v
 
-        # print(sum(p_income))
-        p_disability = [
-            tract['disability'][1] / tract['disability'][0],
-            tract['disability'][2] / tract['disability'][0]
-        ]
-        # print(sum(p_disability))
-        tract_samples = []
-        for j in range(sample_size):
-            sample = []
-            sample.append(int(np.random.choice(len(p_gender), 1, replace=False, p=p_gender)[0]))
-            sample.append(int(np.random.choice(len(p_age), 1, replace=False, p=p_age)[0]))
-            sample.append(int(np.random.choice(len(p_race), 1, replace=False, p=p_race)[0]))
-            sample.append(int(np.random.choice(len(p_income), 1, replace=False, p=p_income)[0]))
-            sample.append(int(np.random.choice(len(p_disability), 1, replace=False, p=p_disability)[0]))
-            tract_samples.append(sample)
-        training_data.append(tract_samples)
-        y.append(tract_rates[str(int(tract_no))])
-        # print(i, tract_no, tract_rates[str(int(tract_no))])
-    to_json = [training_data, y]
+            p_disability = [
+                tract['disability'][1] / tract['disability'][0],
+                tract['disability'][2] / tract['disability'][0]
+            ]
 
+            tract_samples = []
+            for j in range(self.sample_size):
+                sample = []
+                # Assumes independence. Need to report that this is something to improve on to make the model less biased.
+                # Would need more data within one location - should inform in assignment 6 what kind of data we will need to get rid of this bias.
+                # Sample number 5000 might be small, but we should report that this could be edited to make the model better (put this in report)
+                sample.append((int(np.random.choice(len(p_gender), 1, replace=False, p=p_gender)[0])) / (len(p_gender) - 1))
+                sample.append((int(np.random.choice(len(p_age), 1, replace=False, p=p_age)[0])) / (len(p_age) - 1))
+                sample.append((int(np.random.choice(len(p_race), 1, replace=False, p=p_race)[0])) / len(p_race))
+                sample.append((int(np.random.choice(len(p_income), 1, replace=False, p=p_income)[0])) / (len(p_income) - 1))
+                sample.append((int(np.random.choice(len(p_disability), 1, replace=False, p=p_disability)[0])) / (len(p_disability) - 1))
+                tract_samples.append(sample)
+            training_data.append(tract_samples)
+            y.append(tract_rates[str(int(tract_no))])
+        return training_data, y
+
+    # Params:
+    #   gender: {0, 1} ~ {Male, Female}
+    #   age: {0 - 22} ~ {0-4, 5-9, 10-14, 15-17, 18-19, 20, 21, 22-24, 25-29, 30-34, 35-39, 40-44, 
+    #                   45-29, 50-54, 55-59, 60-61, 62-64, 65-66, 67-69, 70-74, 75-79, 80-84, 85+}
+    #   race: {0 - 5} ~ {White, Black, Native, Asian, Pacific Islander, Other}
+    #   income: {0 - 15} ~ {<10k, 10k-14999, 15k-19999, 20k-24999, 25k-29999, 30k-34999, 35k-39999, 
+    #                       40k-44999, 45k-49999, 50k-59999, 60k-74999, 75k-99999, 100k-124999, 
+    #                       125k-149999, 150k-199999, >200k}
+    #   disability: {0, 1} ~ {disabled, not disabled}
+    def createInput(self, gender, age, race, income, disability):
+        return [(gender / (self.gender_size - 1)), 
+                    (age / (self.age_size - 1)),
+                    (race / (self.race_size - 1)),
+                    (income / (self.income_size - 1)),
+                    (disability / (self.disability_size - 1))]
+
+
+if __name__ == '__main__':
+    i = CreateSamplesInputs()
+    X, y = i.get_training_data()
+    to_json = [X, y]
     with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'w') as outfile:
         json.dump(to_json, outfile)
-    return training_data, y
 
-# (X, y) = get_training_data()
-if __name__ == '__main__':
-    with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'r') as f:
-        j = json.load(f)
-        X = j[0]
-        y = j[1]
-        m = ORCA_Rate_Model(200)
-        m.train(X, y)
-        print(m.predict([1,12,3,9,0]))
-        print(m.predict([1,9,2,1,0]))
-        print(m.predict([1,17,3,5,0]))
-        print(m.predict([1,4,8,9,0]))
-        print(m.predict([1,1,2,7,0]))
-        print(m.predict([0,7,3,13,0]))
+# if __name__ == '__main__':
+#     inputs = [sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+#     m = ORCA_Rate_Model(290)
+#     i = CreateSamplesInputs()
+#     with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'r') as f:
+#         arr = json.dump(f)
+#     X = arr[0]
+#     y = arr[1]
+#     m.train(X, y)
+#     print(m.predict(i.createInput(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5])))
