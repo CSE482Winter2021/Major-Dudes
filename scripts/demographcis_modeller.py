@@ -1,9 +1,16 @@
 from sklearn.kernel_approximation import RBFSampler
-import random, os, json, csv, math, sys
+import random
+import os
+import json
+import csv
+import math
 import numpy as np
 from utils import constants
-from sklearn import linear_model
-CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
+CENSUS_OUTPUT_DATA_DIR = os.path.join(
+    constants.DATA_DIR, 'census_data', 'pipeline_output')
+
+
+SAMPLE_SIZE = 100
 
 # TODO: 
 #   Can't use a Logistic Regression with continuous output (y).
@@ -23,7 +30,7 @@ CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeli
 #       Sample number 15000 might be small, but we should report that this could be edited / tuned to make the model better (put this in report)
 
 def sigmoid(x):
-  return 1 / (1 + math.exp(-x))
+    return 1 / (1 + math.exp(-x))
 
 
 class ORCA_Rate_Model:
@@ -194,6 +201,7 @@ class CreateSamplesInputs:
             y.append(tract_rates[str(int(tract_no))])
         return training_data, y
 
+
     # Params:
     #   gender: {0, 1} ~ {Male, Female}
     #   age: {0 - 22} ~ {0-4, 5-9, 10-14, 15-17, 18-19, 20, 21, 22-24, 25-29, 30-34, 35-39, 40-44, 
@@ -218,13 +226,7 @@ if __name__ == '__main__':
     with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'w') as outfile:
         json.dump(to_json, outfile)
 
+
+# # (X, y) = get_training_data()
 # if __name__ == '__main__':
-#     inputs = [sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
-#     m = ORCA_Rate_Model(290)
-#     i = CreateSamplesInputs()
-#     with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'r') as f:
-#         arr = json.dump(f)
-#     X = arr[0]
-#     y = arr[1]
-#     m.train(X, y)
-#     print(m.predict(i.createInput(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5])))
+#     get_training_data()

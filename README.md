@@ -1,19 +1,126 @@
-# Major-Dudes
-Repository for Major Dudes
+# Analysis of ORCA Ridership in King County
+**CSE 482, Winter 2021**
+
+
+
+### Participants
+
+* Kristofer Wong - Undergraduate, Allen School
+* Pierce Kelaita - Undergraduate, Allen School
+* (Advisor) Mark Hallenbeck - Director, Washington State Transportation Center (TRAC)
+
+
+
+### Overview
+
+Many people in King County rely on the King County Metro's extensive bus system to get around. ORCA cards, issued by KCM and other transportation agencies, offer an easy way for riders to access the system and for agencies to collect data on riders to improve their services. However, not all populations have equal access to ORCA cards. This project aims to provide a robust model and intuitive interface to allow agencies to explore trends in ORCA card access in different commiunities across the county. 
+
+
+
+### Project Goals
+
+Our project has 3 main goals that we've refined over the course of the past quarter. The first is to determine the ORCA card penetration rate among Washington state census respondents by census tract in King County. Census tracts are mid-sized groups of census blocks which have roughly equal populations, typically in the low thousands in King County, so we felt they were a good sized chunk on which to develop our analysis.
+
+The second goal is to provide insight into how different subsets of the population have different levels of access to ORCA cards. For this, we looked at sex, race, income, and disability as factors to estimate a given person's of likelihood of carrying an ORCA card, based on King County census data as well as KCM transportation data.
+
+Finally, our third goal is to provide an easy-to-use GUI allowing users to interact with our models to explore trends with a high level of granularity.
+
+Additionally, we aimed to provide a high level of code quality, modularity, and scalability to support future development endeavors on our work.
+
+**Screenshot of the GUI:**
+
+
+
+### Development
+
+Initially, we aimed to answer the broad question, "How equitably are ORCA cards distributed among King County residents?" Development on this project started with a joint effort between us, our advisor, Mark, and some of his colleagues at TRAC to get access to data that could not only answer our question but allow us to refine and formalize the question itself.
+
+From these initial efforts, we were able to gain access to 3 transportation datasets - ORCA boardings by bus route and latitude-longitude coordinates, Automatic Passenger Count (APC) and predicted ORCA boardings by entire bus routes, and a map from each bus stop to its lat-lon coordinates. From here, we began work analysis to take these datasets and estimate the ORCA rate by bus stop. This phase of the project took a considerable amount of time and required 5 separate data pipelines to complete.
+
+Concurrently, we began work on mapping these by-stop estimates to census tracts. In order to do this, we used Washington State Census's API to generate datasets containing information on each tract's population, geographic boundaries, and demographic features (age, race, sex, income, disabilty). Once we had this data, we were able to make our final estimates of by-stop ORCA rates by using tract populations as a proxy value for APC counts within that tract, making the assumption that the two values are directly proportional. More information on this algorithm can be found in the appendix.
+
+When our data pipeline efforts were nearing a close, we began work on the demographic model. We settled on an architecture taking demographic features as inputs and the likelihood of a person with these features to hold on ORCA card as an output. The training data consists of census data on the number of each demographic features per tract, and the output of our data pipelines (i.e., by-stop and by-tract estimated ORCA penetration rates). Given the nature of our training data, we decided to use The model an RBF kernel to model ORCA likelihoods , with its output fed into a sigmoid function to constrain it on the [0,1] probability interval. 
+
+Finally, we developed a web application for our UI. We decided to use a client-server architecture with a MongoDB backend communicating with a React frontend via a Python Flask REST API. Development on the web portion of this project was done concurrently with the model as well as parts of the data pipeline, so we designed it to take advantage of some of the properties of our analyses. For example, while generating the model's training data takes a significant amount of time, training the model is relatively quick, so we opted for a design which re-trains the model on server startup and caches the tensors in the database. Additionally, we noted that our pipeline P5, which estimates by-tract ORCA rates, runs quite fast, so we employ a similar technique here. These techniques have the advantage that tweaks can be made to our analyses and easily re-ran with little to no additional architecture changes throughout the software.
+
+
+
+### Constraints and Limitations
+
+The first and most obvious limitation of our project is the short time in which we had to complete it. The entire process of refining our projcet idea, collecting data, developing, and performing user testing was done in a 10-week period - the length of UW's winter quarter on the quarter system. Because of this, we had to sacrifice a number of features, about which we go into more detail below.
+
+Additionally, we were heavily constrained by the level of granularity in the data to which we were able to gain access. Unfortunately, we were not under NDA and unable to gain access to anything at the individual rider level, since that could be classified as Personally Identifiable Data (PID), which presents a significant security risk. Moreover, while the data we were provided contained accurate measurements of ORCA counts by stop as well as predicted ORCA : APC ratios by route, we were not able to gain access to data or estimations on ORCA : APC rates by stop. Because of this, we had to devote a significant portion of development time to our data pipeline in order to design our own by-stop ORCA rate estimates, which are based on the likely flimsy assumption that APC counts at a given stop scale directly with the populations of the tract within which the stop falls. Additionally, we focused less time on the machine learning model and web application frontend than we would have liked as a result of significant development time on the data pipeline. 
+
+
+
+### User Testing
+
+
+
+### Conclusions and Future Direction
+
+Overall, we are pleased with our development results and have recieved positive feedback from our peers and advisors. We hope that this project is able to make an impact in the King County transportation space, and that development by future maintainers is possible.
+
+In terms of future development, we have hopes to expand on all three components of the project. For the data pipeline, we'd like to do a robust analysis of the level of bias on our by-stop ORCA rate estimates. In order to do this, we'd likely need access to some real by-stop ORCA rates to act as a source of truth. Even a relatively small sample of stops could be instrumental in verifying the validity of our estimates and iterating on top of the analysis. For the model, we'd like to perform similar validation on its accuracy using real-world data. Accessing this data, however, could pose significant difficulties as it would likely be classified as PID. Finally, we'd like to make a number of improvements to the overall user experience on the frontend, as we devoted a relatively small amount of development time towards it. Stretch goals for this project include Dockerizing its components and hosting on AWS and publishing it on an official SDOT listing.
+
+
+
+## User Manual
+
+### Required Installations
+
+* Python 3.9
+  * Packages: pip and virtualenv (latest compatible with Python version)
+* MongoDB Community Edition >= 4.4.1
+* NodeJS >= 14.15.3 / npm (latest compatible with Node version)
+* Browser which supports React ([docs](https://reactjs.org/docs/react-dom.html))
+* GNU Make
+
+
 
 ### Setup
-* Ensure python 3.9 in installed
-* (Reccommended) activate a python3.9 virtual environment in the top-level directory
-* Install requirements: `make bootstrap`
+
+* Navigate to the root directory of this project
+* Activate a Python virtual environment. We used virtualenv, and the software has not been tested in other environments such as Conda.
+  * `python -m pip install virtualenv`
+  * `python -m venv venv`
+* Install dependencies: `make bootstrap`
+
+
 
 ### Running Pipelines
-* `make [pipeline number]` (p1, p2, etc.)
-* Output directory: data/pipeline_outputs
 
-### Misc
-* Since we don't have CI right now, make sure to run `make` before committing/pushing, and resolve any errors
+* Run a specific pipeline: `make [pipeline number]` (p1, p2, etc.)
+* Run all pipelines: `make all`
+* Output directory: *data/pipeline_outputs*
 
-### Calculation of By-Stop ORCA Penetration Rates
+
+
+### Generating Training Data
+
+* `make training`
+* This takes quite a while, so we've included the training data in the repo. If any of the training data generation dependencies (pipelines, sampling script in model) are modified, the above command will re-generate the data.
+
+
+
+### Running the Web Server
+
+* Initialize a MongoDB instance: `mongod`
+  * On MacOS Catalina and later, the above command will result in error, so you can use `mongod --dbpath=~/data/db`, or define your own other custom path for `data/db`, the directory used by Mongo to store entries
+* Start the server: `make server`
+  * This will default to run on port 5000, but this can be changed by setting the environment variable `PORT`, or by providing a different default value in *server/config.py*
+* Start the client: `cd client && npm i && npm start`
+  * This will default to run on port 3000, but this can be changed by setting the environment variable `REACT_APP_PORT`
+* Navigate to *localhost:3000* in your browser, or whatever custom port you've set for React.
+
+
+
+### Appendix - Calculation of By-Stop ORCA Penetration Rates
 
 ![](docs/img/rates-1.jpg)
 ![](docs/img/rates-2.jpg)
+
+
+
+
+

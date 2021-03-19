@@ -208,6 +208,7 @@ class MapPage extends Component {
           )}
           <tr>
             <td>Overall</td>
+            <td></td>
             <td>
               {this.state.tract_perc == -1
                 ? "No data for this tract"
@@ -249,7 +250,7 @@ class MapPage extends Component {
           </Map>
         </div>
         <div className='overlay'>
-          <SimpleSelect index={0} label={'Tract Number'} elements={tractSelector} action={(a, b)=>{this.handleTractClick(b)}} helptext={'Select a tract number to view details about your chosen demographics in that tract.'}/>
+          {/* <SimpleSelect index={0} label={'Tract Number'} elements={tractSelector} action={(a, b)=>{this.handleTractClick(b)}} helptext={'Select a tract number to view details about your chosen demographics in that tract.'}/> */}
           <div className='link'><a href="https://geocoding.geo.census.gov/geocoder/geographies/address?form" target="_blank" rel="noopener noreferrer">Find any address's corresponding tract here</a></div>
         </div>
         { clicked ? <div className='overlay'>
