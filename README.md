@@ -31,6 +31,8 @@ Additionally, we aimed to provide a high level of code quality, modularity, and 
 
 ![screenshot](docs/screenshot.png)
 
+
+
 ### Development
 
 Initially, we aimed to answer the broad question, "How equitably are ORCA cards distributed among King County residents?" Development on this project started with a joint effort between us, our advisor, Mark, and some of his colleagues at TRAC to get access to data that could not only answer our question but allow us to refine and formalize the question itself.
@@ -68,12 +70,13 @@ In our user testing, we came across a few common trends:
 - Users wanted more details / explanations of what our interface does to make it more usable.
 - Users also felt that some sort of visual representation on the map, whether with color or some sort of shading to help users view how common people of their chosen demographics are to live in any particular location.
 
-Unfortunately, given our time constraints, we were unable to model the ORCA rate for demographics at each census tract in order to add location as an input to our model. This is something we will leave for the future because we believe it is vital to helping people draw their own conclusions with our data about what populations in particular may be underrepresented by ORCA data.
+Unfortunately, given our time constraints, we were unable to model the ORCA rate for demographics at each census tract in order to add location as an input to our model. This is something we will leave for the future because we believe it is vital to helping people draw their own conclusions with our data about what populations in particular may be underrepresented by ORCA data. Additionally, given more time, we wouldd have liked to implement a color gradient on the map, where the color of each tract corresponds to its estimated ORCA penetration rate.
 
 Some changes that we were able to implement within this class included:
 - Rewriting the home page to include a more in-depth description of the product, as well as an ORCA card icon to provide a visual aid.
 - Rewording descriptions of the tasks our users can achieve through our interface in response to feedback that users wanted more guidance to make our interface more usable. In particular, we changed the popups on tract information to show the overall tract ORCA percentage at the bottom, and hide the table when no data has been inputted.
 - Added descriptions for each demographic based on how the census defines those demographics to help people like Mav decide what to select. This change added an ‘info’ button under the demographic selectors, which, when clicked, pops up with the descriptions.
+
 
 
 ### Conclusions and Future Direction
