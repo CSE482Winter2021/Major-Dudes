@@ -29,7 +29,7 @@ Additionally, we aimed to provide a high level of code quality, modularity, and 
 
 **Screenshot of the GUI:**
 
-![screenshot](/Users/pierce/cse/482/Major-Dudes/docs/screenshot.png)
+![screenshot](docs/screenshot.png)
 
 ### Development
 
@@ -125,7 +125,7 @@ In terms of future development, we have hopes to expand on all three components 
 ### Running the Web Server
 
 * Initialize a MongoDB instance: `mongod`
-  * On MacOS Catalina and later, the above command will result in error, so you can use `mongod --dbpath=~/data/db`, or define your own other custom path for `data/db`, the directory used by Mongo to store entries
+  * On MacOS Catalina and later, the above command will result in error, so you can use `mongod --dbpath ~/data/db`, or define your own other custom path for `data/db`, the directory used by Mongo to store entries
 * Start the server: `make server`
   * This will default to run on port 5000, but this can be changed by setting the environment variable `PORT`, or by providing a different default value in *server/config.py*
 * Start the client: `cd client && npm i && npm start`
@@ -134,7 +134,7 @@ In terms of future development, we have hopes to expand on all three components 
 
 
 
-### Appendix - Calculation of By-Stop ORCA Penetration Rates
+## Appendix - Calculation of By-Stop ORCA Penetration Rates
 
 ![](docs/img/rates-1.jpg)
 ![](docs/img/rates-2.jpg)
