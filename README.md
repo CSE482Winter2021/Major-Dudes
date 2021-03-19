@@ -13,7 +13,7 @@
 
 ### Overview
 
-Many people in King County rely on the King County Metro's extensive bus system to get around. ORCA cards, issued by KCM and other transportation agencies, offer an easy way for riders to access the system and for agencies to collect data on riders to improve their services. However, not all populations have equal access to ORCA cards. This project aims to provide a robust model and intuitive interface to allow agencies to explore trends in ORCA card access in different commiunities across the county. 
+Many people in King County rely on the King County Metro's extensive bus system to get around. ORCA cards, issued by KCM and other transportation agencies, offer an easy way for riders to access the system and for agencies to collect data on riders to improve their services. However, not all populations have equal access to ORCA cards. This project aims to provide a robust model and intuitive interface to allow agencies to explore trends in ORCA card access in different commiunities across the county.
 
 
 
@@ -57,13 +57,13 @@ Finally, we developed a web application for our UI. We decided to use a client-s
 
 The first and most obvious limitation of our project is the short time in which we had to complete it. The entire process of refining our projcet idea, collecting data, developing, and performing user testing was done in a 10-week period - the length of UW's winter quarter on the quarter system. Because of this, we had to sacrifice a number of features, about which we go into more detail below.
 
-Additionally, we were heavily constrained by the level of granularity in the data to which we were able to gain access. Unfortunately, we were not under NDA and unable to gain access to anything at the individual rider level, since that could be classified as Personally Identifiable Data (PID), which presents a significant security risk. Moreover, while the data we were provided contained accurate measurements of ORCA counts by stop as well as predicted ORCA : APC ratios by route, we were not able to gain access to data or estimations on ORCA : APC rates by stop. Because of this, we had to devote a significant portion of development time to our data pipeline in order to design our own by-stop ORCA rate estimates, which are based on the likely flimsy assumption that APC counts at a given stop scale directly with the populations of the tract within which the stop falls. Additionally, we focused less time on the machine learning model and web application frontend than we would have liked as a result of significant development time on the data pipeline. 
+Additionally, we were heavily constrained by the level of granularity in the data to which we were able to gain access. Unfortunately, we were not under NDA and unable to gain access to anything at the individual rider level, since that could be classified as Personally Identifiable Data (PID), which presents a significant security risk. Moreover, while the data we were provided contained accurate measurements of ORCA counts by stop as well as predicted ORCA : APC ratios by route, we were not able to gain access to data or estimations on ORCA : APC rates by stop. Because of this, we had to devote a significant portion of development time to our data pipeline in order to design our own by-stop ORCA rate estimates, which are based on the likely flimsy assumption that APC counts at a given stop scale directly with the populations of the tract within which the stop falls. Additionally, we focused less time on the machine learning model and web application frontend than we would have liked as a result of significant development time on the data pipeline.
 
 
 
 ### User Testing
 In our user testing, we came across a few common trends:
-- Users felt that in order to determine the combination of demographics and location that are likely to have the lowest ORCA penetration rate or make any constructive conclusions from our data in general, it'd be more useful to have an ORCA estimate for any particular tract given the chosen demographics rather than the likelihood that their someone of their chosen demographics would live in any particular tract. This is in line with what we had hoped to implement eventually, allowing people to include location as an input to our model. 
+- Users felt that in order to determine the combination of demographics and location that are likely to have the lowest ORCA penetration rate or make any constructive conclusions from our data in general, it'd be more useful to have an ORCA estimate for any particular tract given the chosen demographics rather than the likelihood that their someone of their chosen demographics would live in any particular tract. This is in line with what we had hoped to implement eventually, allowing people to include location as an input to our model.
 - Users felt that the organization of our interface wasn't really intuitive - the map was a great visual, but caused confusion between what we meant by estimated ORCA rate for King County as a whole vs per tract information.
 - Users wanted more details / explanations of what our interface does to make it more usable.
 - Users also felt that some sort of visual representation on the map, whether with color or some sort of shading to help users view how common people of their chosen demographics are to live in any particular location.
@@ -71,9 +71,9 @@ In our user testing, we came across a few common trends:
 Unfortunately, given our time constraints, we were unable to model the ORCA rate for demographics at each census tract in order to add location as an input to our model. This is something we will leave for the future because we believe it is vital to helping people draw their own conclusions with our data about what populations in particular may be underrepresented by ORCA data.
 
 Some changes that we were able to implement within this class included:
-- Rewording descriptions of the tasks our users can achieve through our interface in response to feedback that users wanted more guidance to make our interface more usable. In particular,
-- Added a visual scale on the map to help our users complete view how common people of their chosen demographics are to live in any particular location.
-- Added descriptions for each demographic based on how the census defines those demographics to help people like Mav decide what to select. This change added an ‘i’ (information) icon under the demographic selectors, which, when hovered over, pops up with the descriptions.
+- Rewriting the home page to include a more in-depth description of the product, as well as an ORCA card icon to provide a visual aid.
+- Rewording descriptions of the tasks our users can achieve through our interface in response to feedback that users wanted more guidance to make our interface more usable. In particular, we changed the popups on tract information to show the overall tract ORCA percentage at the bottom, and hide the table when no data has been inputted.
+- Added descriptions for each demographic based on how the census defines those demographics to help people like Mav decide what to select. This change added an ‘info’ button under the demographic selectors, which, when clicked, pops up with the descriptions.
 
 
 ### Conclusions and Future Direction

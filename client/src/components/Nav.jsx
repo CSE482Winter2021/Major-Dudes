@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import './Nav.css';
 
 const Nav = () => {
-    
+
   return (
     <Menu right disableAutoFocus noOverlay>
       <Link className="menu-item" to="/" style={{textDecoration: 'none'}}>
@@ -13,9 +13,6 @@ const Nav = () => {
       </Link>
       <Link className="menu-item" to="/Estimator" style={{textDecoration: 'none'}}>
         Estimator
-      </Link>
-      <Link className="menu-item" to="/" style={{textDecoration: 'none'}}>
-        About
       </Link>
     </Menu>
   );
