@@ -17,7 +17,7 @@ function getDesc(type) {
       case "Gender":
         return "The WA Census only stores information on biological sex, although it is categorized as 'gender.' For transgender individuals, the census stores their most recent gender identification. For gender non-conforming individuals, the census records their biological sex at birth.";
       case "Race":
-        return "The WA Census stores information on race as categories White, Black, Native, Pacific Islander, Asian, or Other. Races not specified here (for example, Middle Eastern), or mixed races, are typically categorized under 'Other.'";
+        return "The WA Census stores information on race as categories White, Black, Native, Pacific Islander, Asian, or Other. This is inclusive of single and mixed-race categories. Races not specified here (for example, Middle Eastern and Hispanic), are typically categorized under 'Other.'";
       case "Income":
         return "The WA Census stores information on yearly income in categories by ranges of values, up to $200k, above which is under a single category.";
       case "Disability":
