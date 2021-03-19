@@ -54,7 +54,18 @@ Additionally, we were heavily constrained by the level of granularity in the dat
 
 
 ### User Testing
+In our user testing, we came across a few common trends:
+- Users felt that in order to determine the combination of demographics and location that are likely to have the lowest ORCA penetration rate or make any constructive conclusions from our data in general, it'd be more useful to have an ORCA estimate for any particular tract given the chosen demographics rather than the likelihood that their someone of their chosen demographics would live in any particular tract. This is in line with what we had hoped to implement eventually, allowing people to include location as an input to our model. 
+- Users felt that the organization of our interface wasn't really intuitive - the map was a great visual, but caused confusion between what we meant by estimated ORCA rate for King County as a whole vs per tract information.
+- Users wanted more details / explanations of what our interface does to make it more usable.
+- Users also felt that some sort of visual representation on the map, whether with color or some sort of shading to help users view how common people of their chosen demographics are to live in any particular location.
 
+Unfortunately, given our time constraints, we were unable to model the ORCA rate for demographics at each census tract in order to add location as an input to our model. This is something we will leave for the future because we believe it is vital to helping people draw their own conclusions with our data about what populations in particular may be underrepresented by ORCA data.
+
+Some changes that we were able to implement within this class included:
+- Rewording descriptions of the tasks our users can achieve through our interface in response to feedback that users wanted more guidance to make our interface more usable. In particular,
+- Added a visual scale on the map to help our users complete view how common people of their chosen demographics are to live in any particular location.
+- Added descriptions for each demographic based on how the census defines those demographics to help people like Mav decide what to select. This change added an ‘i’ (information) icon under the demographic selectors, which, when hovered over, pops up with the descriptions.
 
 
 ### Conclusions and Future Direction
