@@ -5,14 +5,15 @@ import json
 import csv
 import math
 import numpy as np
+from tqdm import tqdm
 from utils import constants
 CENSUS_OUTPUT_DATA_DIR = os.path.join(
     constants.DATA_DIR, 'census_data', 'pipeline_output')
 
 
-SAMPLE_SIZE = 100
+SAMPLE_SIZE = 10000
 
-# TODO: 
+# TODO:
 #   Can't use a Logistic Regression with continuous output (y).
 #       Option: calculate W manually: W = pinv(phi_arr) * inverse_sigmoid(y),
 #           But Motoya says that it’s not squared loss so it would not be robust.
@@ -21,9 +22,9 @@ SAMPLE_SIZE = 100
 #       Current state of X given by CreateSamplesInputs.get_training_data is [ 295 x [ sample_size x 5 ] ]
 #           that is 295 locations (tracts), so split into 245 training, 50 data (have to change d in model to be < num_locations, Motoya suggested 240)
 #
-# Assumptions to add to writeup: 
+# Assumptions to add to writeup:
 #   Hyperparameter in our transform less than number of data points we have is okay here
-#   ORCA rate / demographics can be represented by the approximation where d < (295, # of locations). 
+#   ORCA rate / demographics can be represented by the approximation where d < (295, # of locations).
 #       As data increases, this assumption is less restrictive.
 #   Assumes independence in demographics. Need to report that this is something to improve on to make the model less biased.
 #       Would need more data within one location - should inform in assignment 6 what kind of data we will need to get rid of this bias.
@@ -34,22 +35,19 @@ def sigmoid(x):
 
 
 class ORCA_Rate_Model:
-    def __init__(self, d):  # Make d 290 since we have 295 tracts
-        # self.W = None
-        self.fitted_model = None
+    def __init__(self, d):
+        self.W = None
         self.dimensions = d
-        self.clf = linear_model.LogisticRegression(C=1e40, solver='newton-cg')
-        self.kernel = RBFSampler(gamma=1, n_components=d, random_state=1) # might want to tune this to make better
+        self.kernel = RBFSampler(gamma=1, n_components=d, random_state=1)
+        # might want to tune this to make better
 
     def PHI(self, L):
-        # L dimensions [5 x 5000]
-        # transform L to [d x 5000]
         phi_i = np.array(self.kernel.fit_transform(L))
         phi = np.zeros((1, self.dimensions))
         # sum up all 5000 vectors to make [d x 1] & divide by 5000 -> d x 1
         for i in phi_i:
             phi += i
-        return np.array(phi[0] / self.dimensions) 
+        return np.array(phi[0] / self.dimensions)
 
     def train(self, X, y):
         """
@@ -57,32 +55,21 @@ class ORCA_Rate_Model:
         y: ORCA rate for each location
         """
         phi_arr = []
-        for L in X: # X = [295 x [5 x 5000]]
-            transform = self.PHI(L)
-            phi_arr.append(transform) # stack all 295 locations' [d x 1] vectors
-        # phi_arr: [d x 295] matrix
-        X_T = np.array(phi_arr)
+        for L in X:
+            phi_arr.append(self.PHI(L))
+        phi_arr = np.array(phi_arr)
+        inv = np.linalg.pinv(phi_arr)
         y = np.asarray(y, dtype='float64')
-        print(X_T.shape)
-        self.clf.fit(X_T, y) 
-        # Deprecated: Using linear regrassion by inverting output from PHI and matmul by y
-        # phi_arr = np.array(phi_arr)
-        # inv = np.linalg.pinv(phi_arr)
-        # y = np.asarray(y, dtype='float64')
-        # self.W = np.matmul(inv, y) # y = [1 x 295]
+        self.W = np.matmul(inv, y)
 
     def predict(self, X):
         """
         X must be [[ demographics ]]
         """
-        # y = np.matmul(self.kernel.fit_transform([X]), self.W)
-        # y = sigmoid(y)
-        y = self.clf.predict((X))
+        y = np.matmul(self.kernel.fit_transform([X]), self.W)
+        y = sigmoid(y)
         y *= 100
         return y
-
-        # y = sigmoid(W * PHI)
-        # find some logistic regression package to solve / train for W
 
 
 class CreateSamplesInputs:
@@ -204,15 +191,15 @@ class CreateSamplesInputs:
 
     # Params:
     #   gender: {0, 1} ~ {Male, Female}
-    #   age: {0 - 22} ~ {0-4, 5-9, 10-14, 15-17, 18-19, 20, 21, 22-24, 25-29, 30-34, 35-39, 40-44, 
+    #   age: {0 - 22} ~ {0-4, 5-9, 10-14, 15-17, 18-19, 20, 21, 22-24, 25-29, 30-34, 35-39, 40-44,
     #                   45-29, 50-54, 55-59, 60-61, 62-64, 65-66, 67-69, 70-74, 75-79, 80-84, 85+}
     #   race: {0 - 5} ~ {White, Black, Native, Asian, Pacific Islander, Other}
-    #   income: {0 - 15} ~ {<10k, 10k-14999, 15k-19999, 20k-24999, 25k-29999, 30k-34999, 35k-39999, 
-    #                       40k-44999, 45k-49999, 50k-59999, 60k-74999, 75k-99999, 100k-124999, 
+    #   income: {0 - 15} ~ {<10k, 10k-14999, 15k-19999, 20k-24999, 25k-29999, 30k-34999, 35k-39999,
+    #                       40k-44999, 45k-49999, 50k-59999, 60k-74999, 75k-99999, 100k-124999,
     #                       125k-149999, 150k-199999, >200k}
     #   disability: {0, 1} ~ {disabled, not disabled}
     def createInput(self, gender, age, race, income, disability):
-        return [(gender / (self.gender_size - 1)), 
+        return [(gender / (self.gender_size - 1)),
                     (age / (self.age_size - 1)),
                     (race / (self.race_size - 1)),
                     (income / (self.income_size - 1)),
