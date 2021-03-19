@@ -11,7 +11,7 @@ CENSUS_OUTPUT_DATA_DIR = os.path.join(
     constants.DATA_DIR, 'census_data', 'pipeline_output')
 
 
-SAMPLE_SIZE = 10000
+SAMPLE_SIZE = 15000
 
 # TODO:
 #   Can't use a Logistic Regression with continuous output (y).
@@ -89,9 +89,17 @@ class CreateSamplesInputs:
         tract_rates = {tract_rates[idx][0] : tract_rates[idx][1] for idx in range(len(tract_rates))}
         training_data = []
         y = []
-        for tract_no in tr_demo:
-            if str(int(tract_no)) not in tract_rates:
-                continue
+        for tract_no in tqdm(tr_demo):
+
+            rates_key = str(int(tract_no))
+
+            if rates_key not in tract_rates:
+                supertr = int((int(tract_no) - (int(tract_no) % 100)) / 100)
+                if str(int(supertr)) not in tract_rates:
+                    continue
+                else:
+                    rates_key = str(int(supertr))
+
             tract = tr_demo[tract_no]
             p_gender = [
                 round(tract['gender'][1] / tract['gender'][0], 5),
@@ -185,7 +193,7 @@ class CreateSamplesInputs:
                 sample.append((int(np.random.choice(len(p_disability), 1, replace=False, p=p_disability)[0])) / (len(p_disability) - 1))
                 tract_samples.append(sample)
             training_data.append(tract_samples)
-            y.append(tract_rates[str(int(tract_no))])
+            y.append(tract_rates[rates_key])
         return training_data, y
 
 
