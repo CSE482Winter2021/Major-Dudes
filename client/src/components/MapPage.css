@@ -20,7 +20,7 @@ body {
     /* transition: all 300ms; */
     background:rgb(230, 230, 230);
     padding:10px;
-    margin:auto;
+    margin:0px;
     color:black;
     width: 40%;
     height: auto; 
@@ -58,4 +58,10 @@ body {
 
 .italics {
     font-style: oblique;
+  }
+
+
+.bold {
+    font-weight:bold;
+    margin-bottom:'3%';
   }

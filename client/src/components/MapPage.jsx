@@ -156,8 +156,17 @@ class MapPage extends Component {
     const hasData = this.props.selectors[0];
     return (
       <div className="container">
+        <div className="italics">
+          <br />
+          Overall estimated ORCA penetration rate for Tract {tract_demos[tract_num]["name"]}: 
+          {this.state.tract_perc == -1
+            ? "\tNo data for this tract"
+            : `\t${(100 * this.state.tract_perc).toFixed(2)}%`}
+        </div>
         {hasData ? (
+          <div style={{marginTop:'3%'}}>
           <table className="demo_table">
+            <caption className="bold">Likelihood these demographics exist in King County vs Tract {tract_demos[tract_num]["name"]}</caption>
             <tr>
               <th></th>
               <th>King County</th>
@@ -263,16 +272,10 @@ class MapPage extends Component {
               </td>
             </tr>
           </table>
+          </div>
         ) : (
           ""
         )}
-        <div>
-          <br />
-          Estimated ORCA penetration rate:
-          {this.state.tract_perc == -1
-            ? "\tNo data for this tract"
-            : `\t${(100 * this.state.tract_perc).toFixed(2)}%`}
-        </div>
       </div>
     );
   }
