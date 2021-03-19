@@ -134,7 +134,7 @@ In terms of future development, we have hopes to expand on all three components 
 
 
 
-##Appendix - Calculation of By-Stop ORCA Penetration Rates
+## Appendix - Calculation of By-Stop ORCA Penetration Rates
 
 ![](docs/img/rates-1.jpg)
 ![](docs/img/rates-2.jpg)
