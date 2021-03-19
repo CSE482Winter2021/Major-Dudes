@@ -29,7 +29,7 @@ Additionally, we aimed to provide a high level of code quality, modularity, and 
 
 **Screenshot of the GUI:**
 
-![screenshot](/Users/pierce/cse/482/Major-Dudes/docs/screenshot.png)
+![screenshot](docs/screenshot.png)
 
 ### Development
 
