@@ -1,12 +1,20 @@
 from sklearn.kernel_approximation import RBFSampler
-import random, os, json, csv, math
+import random
+import os
+import json
+import csv
+import math
 import numpy as np
 from utils import constants
-CENSUS_OUTPUT_DATA_DIR = os.path.join(constants.DATA_DIR, 'census_data', 'pipeline_output')
+CENSUS_OUTPUT_DATA_DIR = os.path.join(
+    constants.DATA_DIR, 'census_data', 'pipeline_output')
+
+
+SAMPLE_SIZE = 100
 
 
 def sigmoid(x):
-  return 1 / (1 + math.exp(-x))
+    return 1 / (1 + math.exp(-x))
 
 
 class ORCA_Rate_Model:
@@ -70,8 +78,9 @@ def get_training_data():
         tr_demo = json.load(f)
     with open(f'{CENSUS_OUTPUT_DATA_DIR}/tract_rates.csv', 'r') as f:
         tract_rates = list(csv.reader(f))
-    tract_rates = {tract_rates[idx][0] : tract_rates[idx][1] for idx in range(len(tract_rates))}
-    training_data = [] #np.zeros((num_tracts, sample_size, num_dim))
+    tract_rates = {tract_rates[idx][0]: tract_rates[idx][1]
+                   for idx in range(len(tract_rates))}
+    training_data = []  # np.zeros((num_tracts, sample_size, num_dim))
     y = []
     for tract_no in tr_demo:
         if str(int(tract_no)) not in tract_rates:
@@ -161,13 +170,18 @@ def get_training_data():
         ]
         # print(sum(p_disability))
         tract_samples = []
-        for j in range(sample_size):
+        for j in range(SAMPLE_SIZE):
             sample = []
-            sample.append(int(np.random.choice(len(p_gender), 1, replace=False, p=p_gender)[0]))
-            sample.append(int(np.random.choice(len(p_age), 1, replace=False, p=p_age)[0]))
-            sample.append(int(np.random.choice(len(p_race), 1, replace=False, p=p_race)[0]))
-            sample.append(int(np.random.choice(len(p_income), 1, replace=False, p=p_income)[0]))
-            sample.append(int(np.random.choice(len(p_disability), 1, replace=False, p=p_disability)[0]))
+            sample.append(int(np.random.choice(
+                len(p_gender), 1, replace=False, p=p_gender)[0]))
+            sample.append(int(np.random.choice(
+                len(p_age), 1, replace=False, p=p_age)[0]))
+            sample.append(int(np.random.choice(
+                len(p_race), 1, replace=False, p=p_race)[0]))
+            sample.append(int(np.random.choice(
+                len(p_income), 1, replace=False, p=p_income)[0]))
+            sample.append(int(np.random.choice(len(p_disability),
+                                               1, replace=False, p=p_disability)[0]))
             tract_samples.append(sample)
         training_data.append(tract_samples)
         y.append(tract_rates[str(int(tract_no))])
@@ -178,17 +192,7 @@ def get_training_data():
         json.dump(to_json, outfile)
     return training_data, y
 
+
 # (X, y) = get_training_data()
 if __name__ == '__main__':
-    with open(f'{CENSUS_OUTPUT_DATA_DIR}/samples.json', 'r') as f:
-        j = json.load(f)
-        X = j[0]
-        y = j[1]
-        m = ORCA_Rate_Model(200)
-        m.train(X, y)
-        print(m.predict([1,12,3,9,0]))
-        print(m.predict([1,9,2,1,0]))
-        print(m.predict([1,17,3,5,0]))
-        print(m.predict([1,4,8,9,0]))
-        print(m.predict([1,1,2,7,0]))
-        print(m.predict([0,7,3,13,0]))
+    get_training_data()

@@ -13,6 +13,9 @@ bootstrap:
 	@python3.9 -m pip install -e .
 	@find . -type d -name '*.egg-info' -prune -exec rm -rf {} \;
 
+training:
+	@python3.9 scripts/demographcis_modeller.py
+
 server:
 	@python3.9 server/api.py
 
